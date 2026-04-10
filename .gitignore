@@ -212,4 +212,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Environment variable for project
+.env
+
 # End of https://www.toptal.com/developers/gitignore/api/java,macos,windows,visualstudiocode,intellij+all,maven
