@@ -1,11 +1,19 @@
 package se.mau.localzero.domain;
 
 import jakarta.persistence.*;
-
+import lombok.Getter;
+import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Entityclass representing the user in the system.
+ * This class is connected to the User table in the PostgreSQL database
+ */
+
 @Entity
+@Getter
+@Setter
 @Table(name = "users")
 public class User {
 
@@ -13,11 +21,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(nullable = false, unique = true)
+    private String username;
 
-    @Column(nullable = false,  unique = true)
+    /*@Column(nullable = false,  unique = true)
     private String email;
+
+     */
 
     @Column(nullable = false)
     private String community;
@@ -33,10 +43,18 @@ public class User {
     protected User() {
     }
 
-    public User(String name, String email, String community, String password) {
+    public User(String username, String community, String password) {
+        this.username = username;
+        this.community = community;
+        this.password = password;
+    }
+
+    /*public User(String name, String email, String community, String password) {
         this.name = name;
         this.email = email;
         this.community = community;
         this.password = password;
     }
+
+     */
 }

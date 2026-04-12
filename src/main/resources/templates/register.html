@@ -2,9 +2,36 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <title>Register - LocalZero</title>
 </head>
 <body>
-<h1>Register</h1>
+    <h1>Create an account for LocalZero</h1>
+
+<form th:action="@{/auth/register}" method="post">
+
+    <div>
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter a username..." required/>
+    </div>
+
+    <div>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="BillyBobby123!" required/>
+    </div>
+
+    <div>
+        <label for="community">Choose a community:</label>
+        <select name="community" id="community">
+            <option value="Halmstad">Halmstad</option>
+            <option value="Trelleborg">Trelleborg</option>
+            <option value="Malmö">Malmö</option>
+        </select>
+    </div>
+
+    <button type="submit">Register</button>
+</form>
+
+<p>Already have an account? <a th:href="@{/auth/login}">Log in here</a> </p>
+
 </body>
 </html>
