@@ -13,6 +13,7 @@ import lombok.Setter;
 @Setter
 public class UserRegistrationDto {
     private String username;
+    private String email;
     private String community;
     private String password;
 }

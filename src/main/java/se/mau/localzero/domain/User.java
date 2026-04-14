@@ -25,10 +25,8 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
 
-    /*@Column(nullable = false,  unique = true)
+    @Column(nullable = false,  unique = true)
     private String email;
-
-     */
 
     @Column(nullable = false)
     private String community;
@@ -46,18 +44,10 @@ public class User {
     protected User() {
     }
 
-    public User(String username, String community, String password) {
+    public User(String username, String email, String community, String password) {
         this.username = username;
-        this.community = community;
-        this.password = password;
-    }
-
-    /*public User(String name, String email, String community, String password) {
-        this.name = name;
         this.email = email;
         this.community = community;
         this.password = password;
     }
-
-     */
 }

@@ -43,6 +43,7 @@ public class AuthController {
         try {
             authService.registerNewUser(
                     dto.getUsername(),
+                    dto.getEmail(),
                     dto.getCommunity(),
                     dto.getPassword()
             );

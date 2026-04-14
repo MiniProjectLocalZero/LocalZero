@@ -29,8 +29,8 @@ public class AuthService {
      * @param community User chosen Community
      * @param unhashedPass Plaintext password
      */
-    public void registerNewUser(String username, String community, String unhashedPass) {
-        User newUser = new User(username, community, unhashedPass);
+    public void registerNewUser(String username, String email, String community, String unhashedPass) {
+        User newUser = new User(username, email, community, unhashedPass);
 
         RegistrationHandler validation = new ValidationHandler();
         RegistrationHandler checkExist = new UserExistHandler(userRepository);
