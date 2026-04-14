@@ -4,7 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+/**
+ * Configuration class
+ * Decides how login works and uses encryption algorithms for passwords
+ */
 
 @Configuration
 @EnableWebSecurity
@@ -18,12 +25,18 @@ public class SecurityConfig {
                     .anyRequest().authenticated()
             )
             .formLogin((form) -> form
-                .loginPage("/login")
+                .loginPage("/auth/login") //The page we want to show
+                    .loginProcessingUrl("/login") //The page where the POST gets sent
                 .permitAll()
             )
             .logout((logout) -> logout.permitAll());
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 }
