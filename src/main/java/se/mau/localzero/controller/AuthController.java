@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import se.mau.localzero.dto.UserRegistrationDto;
 import se.mau.localzero.service.AuthService;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 /**
  * Controller for handling incoming HTTP-requests for login and registration
  */
@@ -47,7 +50,8 @@ public class AuthController {
             return "redirect:/auth/login?success";
 
         } catch (Exception e) {
-            return "redirect:/auth/register?error=" + e.getMessage();
+            String safeErrorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/auth/register?error=" + safeErrorMessage;
         }
     }
 }

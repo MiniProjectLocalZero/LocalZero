@@ -3,6 +3,7 @@ package se.mau.localzero.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name = "users")
+@Table(name = "localzero_users")
 public class User {
 
     @Id
@@ -37,7 +38,9 @@ public class User {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "user_roles")
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"))
     private Set<UserRole> roles = new HashSet<>();
 
     protected User() {
