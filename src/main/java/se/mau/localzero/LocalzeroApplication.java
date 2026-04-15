@@ -11,16 +11,10 @@ public class LocalzeroApplication {
 		Dotenv dotenv = null;
 		try {
 			dotenv = Dotenv.configure()
-					.directory("./backend")
-					.load();
-		} catch (Exception e) {
-			dotenv = Dotenv.configure()
 					.directory("./")
 					.ignoreIfMissing()
 					.load();
-		}
-
-		if (dotenv == null) {
+		} catch (Exception e) {
 			dotenv = Dotenv.configure()
 					.ignoreIfMissing()
 					.load();
