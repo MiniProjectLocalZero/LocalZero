@@ -2,6 +2,7 @@ package se.mau.localzero.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import se.mau.localzero.domain.Community;
 import se.mau.localzero.domain.User;
 import se.mau.localzero.domain.UserRole;
 import se.mau.localzero.handler.RegistrationHandler;
@@ -26,10 +27,12 @@ public class AuthService {
     /**
      * Tries to register a new user by running the validation chain.
      * @param username User chosen Username
-     * @param community User chosen Community
+     * @param userCommunity User chosen Community
      * @param unhashedPass Plaintext password
      */
-    public void registerNewUser(String username, String email, String community, String unhashedPass) {
+    public void registerNewUser(String username, String email, String userCommunity, String unhashedPass) {
+        Community community = new Community(userCommunity);
+
         User newUser = new User(username, email, community, unhashedPass);
 
         RegistrationHandler validation = new ValidationHandler();
@@ -43,7 +46,7 @@ public class AuthService {
         if (validation.check(newUser)) {
             newUser.setPassword(passwordEncoder.encode(unhashedPass));
 
-            newUser.getRoles().add(UserRole.USER);
+            newUser.getRoles().add(UserRole.RESIDENT);
 
             userRepository.save(newUser);
         }
