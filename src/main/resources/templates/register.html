@@ -3,40 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <title>Register - LocalZero</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <h1>Create an account for LocalZero</h1>
 
 <form th:action="@{/auth/register}" method="post">
 
-    <div>
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" placeholder="Enter a username..." required/>
-    </div>
+    <div class="box">
+        <h1>Register</h1>
+        <h5>please enter your details</h5>
 
-    <div>
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="billybobby@gmail.com" required/>
-    </div>
+        <div class="input-row">
+            <div class="input-group">
+                <label for="name"><span class="required">*</span> Name</label>
+                <input type="text" id="name" name="name" required/>
+            </div>
+            <div class="input-group">
+                <label for="username"><span class="required">*</span> Username</label>
+                <input type="text" id="username" name="username" required/>
+            </div>
+        </div>
 
-    <div>
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="BillyBobby123!" required/>
-    </div>
+        <div class="input-group">
+            <label for="email"><span class="required">*</span> Email</label>
+            <input type="email" id="email" name="email" required/>
+        </div>
 
-    <div>
-        <label for="community">Choose a community:</label>
-        <select name="community" id="community">
-            <option value="Halmstad">Halmstad</option>
-            <option value="Trelleborg">Trelleborg</option>
-            <option value="Malmö">Malmö</option>
-        </select>
-    </div>
+        <div class="input-row">
+            <div class="input-group">
+                <label for="password"><span class="required">*</span> Password</label>
+                <input type="password" id="password" name="password" required/>
+            </div>
+            <div class="input-group">
+                <label for="confirm"><span class="required">*</span> Confirm Password</label>
+                <input type="password" id="confirm" name="confirm" required/>
+            </div>
+        </div>
 
-    <button type="submit">Register</button>
+        <div class="input-group">
+            <label for="community"><span class="required">*</span> Community</label>
+            <select name="community" id="community">
+                <option value="Halmstad">Halmstad</option>
+                <option value="Trelleborg">Trelleborg</option>
+                <option value="Malmö">Malmö</option>
+            </select>
+        </div>
+
+        <button type="submit" class="login-btn">Register</button>
+        <p>Already have an account? <a id="signup" th:href="@{/auth/login}">Sign in</a></p>
+    </div>
 </form>
 
-<p>Already have an account? <a th:href="@{/auth/login}">Log in here</a> </p>
 
 </body>
 </html>
