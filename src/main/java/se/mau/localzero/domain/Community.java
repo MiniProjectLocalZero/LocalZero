@@ -18,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = {"members", "initiatives"})
-@Table(name = "community")
+@Table(name = "communities")
 public class Community {
 
     @Id

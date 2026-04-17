@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = "user")
-@Table(name = "sustainability_action")
+@Table(name = "sustainability_actions")
 public class SustainabilityAction {
 
     @Id

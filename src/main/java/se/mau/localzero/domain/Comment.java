@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = {"author", "post"})
-@Table(name = "comment")
+@Table(name = "comments")
 public class Comment {
 
     @Id

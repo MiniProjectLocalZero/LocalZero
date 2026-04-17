@@ -32,7 +32,7 @@ import java.util.Set;
         "sentMessages",
         "receivedMessages"
 })
-@Table(name = "user")
+@Table(name = "users")
 public class User {
 
     @Id

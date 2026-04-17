@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = "recipient")
-@Table(name = "notification")
+@Table(name = "notifications")
 public class Notification {
 
     @Id

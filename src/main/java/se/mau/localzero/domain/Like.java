@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = {"user", "post"})
 @Table(
-        name = "like",
-        uniqueConstraints = @UniqueConstraint(name = "uk_like_user_post", columnNames = {"user_id", "post_id"})
+        name = "likes",
+        uniqueConstraints = @UniqueConstraint(name = "uk_likes_user_post", columnNames = {"user_id", "post_id"})
 )
 public class Like {
 
