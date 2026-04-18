@@ -1,4 +1,4 @@
-package se.mau.localzero.handler;
+package se.mau.localzero.auth.handler;
 
 import se.mau.localzero.domain.User;
 
