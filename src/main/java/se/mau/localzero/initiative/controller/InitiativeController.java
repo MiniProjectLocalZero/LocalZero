@@ -9,7 +9,7 @@ import se.mau.localzero.domain.Initiative;
 import se.mau.localzero.domain.User;
 import se.mau.localzero.initiative.dto.InitiativeDto;
 import se.mau.localzero.initiative.service.InitiativeService;
-import se.mau.localzero.repository.UserRepository;
+import se.mau.localzero.auth.repository.UserRepository;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

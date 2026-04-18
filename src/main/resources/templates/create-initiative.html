@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <title>Create Initiative</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
+    <link rel="stylesheet" th:href="@{/navbar.css}">
 </head>
 <body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
     <div class="container">
         <h1>Start a new Initiative</h1>
         <p>Fill in the details below to create a new initiative for your community.</p>

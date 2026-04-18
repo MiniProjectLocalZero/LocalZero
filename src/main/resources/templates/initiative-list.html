@@ -4,29 +4,34 @@
     <meta charset="UTF-8">
     <title>Create Initiative</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
+    <link rel="stylesheet" th:href="@{/navbar.css}">
 </head>
 <body>
-<div class="initiatives-container">
-    <div th:each="init : ${initiatives}" class="initiative-card">
-        <div class="card-content">
-            <span class="badge" th:text="${init.category}">Category</span>
-            <h3 th:text="${init.title}">Title</h3>
-            <p th:text="${init.description}">Description</p>
-        </div>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="center-screen-wrapper">
 
-        <div class="card-footer">
-            <div class="stats">
+    <div class="initiatives-container">
+        <div th:each="init : ${initiatives}" class="initiative-card">
+            <div class="card-content">
+                <span class="badge" th:text="${init.category}">Category</span>
+                <h3 th:text="${init.title}">Title</h3>
+                <p th:text="${init.description}">Description</p>
+            </div>
+
+            <div class="card-footer">
+                <div class="stats">
                 <span class="stat-item">
                     <i class="fas fa-heart"></i> 0
                 </span>
-                <span class="stat-item">
+                    <span class="stat-item">
                     <i class="fas fa-comment"></i> Updates
                 </span>
-            </div>
+                </div>
 
-            <div class="actions">
-                <button class="btn-join" title="Join Initiative">+</button>
-                <a th:href="@{/initiatives/{id}(id=${init.id})}" class="btn-details">View</a>
+                <div class="actions">
+                    <button class="btn-join" title="Join Initiative">+</button>
+                    <a th:href="@{/initiatives/{id}(id=${init.id})}" class="btn-details">View</a>
+                </div>
             </div>
         </div>
     </div>

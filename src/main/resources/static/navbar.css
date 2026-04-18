@@ -1,0 +1,29 @@
+/* NAVBAR */
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.nav-wrapper {
+    background-color: var(--light-green-color);
+    color: var(--light-sand-color);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logged-in-as {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#logged-in-span {
+    font-size: 1.1em;
+}

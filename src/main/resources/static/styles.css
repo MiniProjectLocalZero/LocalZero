@@ -1,14 +1,24 @@
+:root {
+    --dark-green-color: #546B41;
+    --light-green-color: #99AD7A;
+    --dark-sand-color: #DCCCAC;
+    --light-sand-color: #FFF8EC;
+}
+
 body {
     line-height: 1.5;
     background-color: #f4f6f0;
     font-family: 'Inter', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     min-height: 100vh;
     margin: 0;
     font-weight: lighter;
+}
 
+.center-screen-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 70px);
 }
 
 h1 {

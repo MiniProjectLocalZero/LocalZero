@@ -8,30 +8,33 @@
 
 <body>
 <form th:action="@{/auth/login}" method="post">
-    <div class="box">
-        <h1>Welcome back</h1>
-        <h5>please enter your details </h5>
+    <div class="center-screen-wrapper">
+        <div class="box">
+            <h1>Welcome back</h1>
+            <h5>please enter your details </h5>
 
-        <div class="input-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="Username" required/>
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Username" required/>
+            </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Password" required/>
+            </div>
+
+            <button type="submit" class="login-btn">Sign In</button>
+            <div class="options-row">
+                <label class="remember-me">
+                    <input type="checkbox" name="remember"> Remember me
+                </label>
+                <a href="@/auth/forgot-password" class="forgot-password">Forgot password?</a>
+            </div>  <!vet ej om vi ska implementera forgot password, men designen kan finnas >
+
+            <p>Don't have an account? <a id="signup" th:href="@{/auth/register}">Sign Up</a></p>
         </div>
-
-        <div class="input-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Password" required/>
-        </div>
-
-        <button type="submit" class="login-btn">Sign In</button>
-        <div class="options-row">
-            <label class="remember-me">
-                <input type="checkbox" name="remember"> Remember me
-            </label>
-            <a href="@/auth/forgot-password" class="forgot-password">Forgot password?</a>
-        </div>  <!vet ej om vi ska implementera forgot password, men designen kan finnas >
-
-        <p>Don't have an account? <a id="signup" th:href="@{/auth/register}">Sign Up</a></p>
     </div>
+
 </form>
 </body>
 </html>
