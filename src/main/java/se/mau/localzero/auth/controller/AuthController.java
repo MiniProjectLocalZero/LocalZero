@@ -1,12 +1,12 @@
-package se.mau.localzero.controller;
+package se.mau.localzero.auth.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import se.mau.localzero.dto.UserRegistrationDto;
-import se.mau.localzero.service.AuthService;
+import se.mau.localzero.auth.dto.UserRegistrationDto;
+import se.mau.localzero.auth.service.AuthService;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

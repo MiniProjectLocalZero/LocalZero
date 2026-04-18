@@ -1,7 +1,7 @@
-package se.mau.localzero.handler;
+package se.mau.localzero.auth.handler;
 
 import se.mau.localzero.domain.User;
-import se.mau.localzero.repository.UserRepository;
+import se.mau.localzero.auth.repository.UserRepository;
 
 /**
  * A specific link in the registration chain.
