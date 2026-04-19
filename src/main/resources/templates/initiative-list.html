@@ -29,7 +29,14 @@
                 </div>
 
                 <div class="actions">
-                    <button class="btn-join" title="Join Initiative">+</button>
+                    <form th:if="${currentUser != null and !#sets.contains(init.participants, currentUser)}"
+                          th:action="@{/initiatives/{id}/join(id=${init.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn-join" title="Join Initiative">+</button>
+                    </form>
+                    <form th:if="${currentUser != null and #sets.contains(init.participants, currentUser)}"
+                          th:action="@{/initiatives/{id}/leave(id=${init.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn-join" title="Leave Initiative">−</button>
+                    </form>
                     <a th:href="@{/initiatives/{id}(id=${init.id})}" class="btn-details">View</a>
                 </div>
             </div>
