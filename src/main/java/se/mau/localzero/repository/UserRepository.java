@@ -2,8 +2,10 @@ package se.mau.localzero.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import se.mau.localzero.domain.Community;
 import se.mau.localzero.domain.User;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -13,4 +15,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
+
+    Optional<List<User>> findByCommunity(Community community);
 }

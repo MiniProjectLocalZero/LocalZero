@@ -116,6 +116,10 @@ public class User {
         initiative.getParticipants().remove(this);
     }
 
+    public void addNotification(Notification notification) {
+        notifications.add(notification);
+    }
+
     @PrePersist
     void onCreate() {
         this.createdAt = LocalDateTime.now();
