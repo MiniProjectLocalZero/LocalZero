@@ -5,6 +5,10 @@
     <title>Community Feed - LocalZero</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <script th:src="@{/js/initiative.js}" defer></script>
 </head>
 <body>
 
@@ -29,10 +33,10 @@
 
         <div class="card-footer">
             <div class="engagement">
-        <span class="metric">
-            <i class="far fa-heart"></i>
-            <span th:text="${init.participants.size()}">0</span> likes
-        </span>
+               <span class="metric like-container" th:data-id="${init.id}" onclick="toggleLike(this)">
+                    <i th:class="${init.participants.contains(#authentication.principal) ? 'fas fa-heart heart-icon liked' : 'far fa-heart heart-icon'}"></i>
+                    <span class="like-count" th:text="${init.participants.size()}">0</span> likes
+               </span>
 
                 <button class="btn-join-action">
                     <i class="fas fa-plus"></i> Join initiative

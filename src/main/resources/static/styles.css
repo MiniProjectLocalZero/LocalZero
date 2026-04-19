@@ -407,3 +407,12 @@ p {
     display: flex;
     align-items: center;
 }
+
+.heart-icon.liked {
+    color: #e74c3c;
+}
+
+.like-container {
+    cursor: pointer;
+    user-select: none;
+}

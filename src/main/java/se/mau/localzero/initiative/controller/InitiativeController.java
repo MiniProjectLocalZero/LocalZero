@@ -116,4 +116,36 @@ public class InitiativeController {
         initiativeRepository.delete(initiative);
         return "redirect:/initiatives?success";
     }
+
+    @PostMapping("/{id}/like")
+    @ResponseBody //returns JSON response
+    public ResponseEntity<?> toggleLike(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        try{
+            Initiative initiative = initiativeRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Initiative not found"));
+
+            User user = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            boolean isLiked;
+
+            if (initiative.getParticipants().contains(user)) {
+                initiative.removeParticipant(user);
+                isLiked = false;
+            }else{
+                initiative.addParticipant(user);
+                isLiked = true;
+            }
+            initiativeRepository.save(initiative);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "newLikeCount", initiative.getParticipants().size(),
+                    "isLiked", isLiked
+            ));
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "error", e.getMessage()));
+        }
+    }
 }
