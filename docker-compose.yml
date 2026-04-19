@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: localzero-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: localzero
+      POSTGRES_USER: localzero
+      POSTGRES_PASSWORD: localzero
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U localzero -d localzero"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: localzero-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/localzero
+      DB_USERNAME: localzero
+      DB_PASSWORD: localzero
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres-data:
