@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run Maven clean and compile
+        run: mvn clean compile
+
+      - name: Run Maven tests
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/test_db
+          DB_USERNAME: test_user
+          DB_PASSWORD: test_password
+        run: mvn test
+
