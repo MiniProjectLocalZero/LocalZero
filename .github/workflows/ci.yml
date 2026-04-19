@@ -29,9 +29,5 @@ jobs:
         run: mvn clean compile
 
       - name: Run Maven tests
-        env:
-          DB_URL: jdbc:postgresql://localhost:5432/test_db
-          DB_USERNAME: test_user
-          DB_PASSWORD: test_password
         run: mvn test
 
