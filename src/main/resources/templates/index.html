@@ -1,13 +1,24 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
+    <title>LocalZero - Home Page</title>
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" th:href="@{/navbar.css}">
 </head>
 <body>
-<h1>Welcome to Local Zero!</h1>
-<h2>The solution your neighborhood community needs!</h2>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div>
+    <h1>Welcome to Local Zero!</h1>
+    <h2>The solution your neighborhood community needs!</h2>
+    <div class="buttons">
+        <div class="actions">
+            <a th:href="@{/initiatives/create}" class="btn">Create a new initiative</a>
+        </div>
+    </div>
+
+</div>
+
 </body>
 </html>

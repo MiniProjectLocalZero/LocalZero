@@ -1,14 +1,14 @@
-package se.mau.localzero.service;
+package se.mau.localzero.auth.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import se.mau.localzero.domain.Community;
 import se.mau.localzero.domain.User;
 import se.mau.localzero.domain.UserRole;
-import se.mau.localzero.handler.RegistrationHandler;
-import se.mau.localzero.handler.UserExistHandler;
-import se.mau.localzero.handler.ValidationHandler;
-import se.mau.localzero.repository.UserRepository;
+import se.mau.localzero.auth.handler.RegistrationHandler;
+import se.mau.localzero.auth.handler.UserExistHandler;
+import se.mau.localzero.auth.handler.ValidationHandler;
+import se.mau.localzero.auth.repository.UserRepository;
 
 /**
  * Service for handling authentication business logic

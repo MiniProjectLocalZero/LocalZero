@@ -1,4 +1,4 @@
-package se.mau.localzero.service;
+package se.mau.localzero.auth.service;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import se.mau.localzero.domain.User;
-import se.mau.localzero.repository.UserRepository;
+import se.mau.localzero.auth.repository.UserRepository;
 
 /**
  * Works as a bridge between the application's own database (UserRepository)

@@ -1,4 +1,4 @@
-package se.mau.localzero.config;
+package se.mau.localzero.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,15 +21,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/", "/auth/login", "/auth/register", "/styles.css").permitAll()
+                .requestMatchers("/auth/login", "/auth/register", "/styles.css").permitAll()
                     .anyRequest().authenticated()
             )
             .formLogin((form) -> form
                 .loginPage("/auth/login") //The page we want to show
-                    .loginProcessingUrl("/login") //The page where the POST gets sent
+                    .loginProcessingUrl("/auth/login") //The page where the POST gets sent
+                    .defaultSuccessUrl("/", true)
                 .permitAll()
             )
-            .logout((logout) -> logout.permitAll());
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/auth/login?logout")
+                        .permitAll()
+                );
 
         return http.build();
     }

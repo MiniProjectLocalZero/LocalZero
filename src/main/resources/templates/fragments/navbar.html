@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>LocalZero - Navbar</title>
+    <link rel="stylesheet" th:href="@{/navbar.css}">
+</head>
+<body>
+<nav th:fragment="navbar" class="nav-wrapper" >
+    <div>
+        <h2>LocalZero</h2>
+    </div>
+
+    <div class="logged-in-as" sec:authorize="isAuthenticated()">
+        <span id="logged-in-span">Logged In as: <strong sec:authentication="name"></strong></span>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Log out</button>
+        </form>
+    </div>
+
+</nav>
+
+</body>
+</html>

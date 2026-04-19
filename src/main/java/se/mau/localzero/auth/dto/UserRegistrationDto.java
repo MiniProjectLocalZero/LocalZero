@@ -1,4 +1,4 @@
-package se.mau.localzero.dto;
+package se.mau.localzero.auth.dto;
 
 import lombok.Getter;
 import lombok.Setter;
