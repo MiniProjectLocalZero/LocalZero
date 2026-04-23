@@ -27,7 +27,7 @@ public class NotificationController {
 
     /**
      * Display the notification inbox for the currently authenticated user.
-     * Shows all unread notifications with most recent first.
+     * Shows all notifications, both read and unread with most recent first.
      *
      * @param userDetails The currently authenticated user
      * @param model The model to pass data to the view
@@ -38,10 +38,10 @@ public class NotificationController {
         try {
             User currentUser = userDetails.getUser();
 
-            List<Notification> unreadNotifications = notificationService.getUnreadNotifications(currentUser);
+            List<Notification> notifications = notificationService.getNotificationInbox(currentUser);
             long unreadCount = notificationService.getUnreadNotificationCount(currentUser);
 
-            model.addAttribute("unreadNotifications", unreadNotifications);
+            model.addAttribute("notifications", notifications);
             model.addAttribute("unreadCount", unreadCount);
             model.addAttribute("notificationService", notificationService); // For link generation in template
 
@@ -53,10 +53,9 @@ public class NotificationController {
     }
 
     /**
-     * Get unread notification count for AJAX/navbar updates.
-     * Returns JSON count.
-     *
-     * GET /notifications/unread-count
+     * Get unread notification count for the currently authenticated user.
+     * @param userDetails The currently authenticated user
+     * @return The count of unread notifications
      */
     @GetMapping("/unread-count")
     @ResponseBody
@@ -67,8 +66,9 @@ public class NotificationController {
 
     /**
      * Mark a single notification as read.
-     *
-     * POST /notifications/{id}/read
+     * @param userDetails The currently authenticated user
+     * @param notificationId The ID of the notification to mark as read
+     * @return Redirect to the inbox view with a success message
      */
     @PostMapping("/{id}/read")
     public String markAsRead(@AuthenticationPrincipal LocalZeroUserDetails userDetails,
@@ -79,9 +79,10 @@ public class NotificationController {
     }
 
     /**
-     * Mark a single notification as unread (snooze feature).
-     *
-     * POST /notifications/{id}/unread
+     * Mark a single notification as unread.
+     * @param userDetails The currently authenticated user
+     * @param notificationId The ID of the notification to mark as unread
+     * @return Redirect to the inbox view with a success message
      */
     @PostMapping("/{id}/unread")
     public String markAsUnread(@AuthenticationPrincipal LocalZeroUserDetails userDetails,
@@ -93,8 +94,9 @@ public class NotificationController {
 
     /**
      * Delete a notification.
-     *
-     * POST /notifications/{id}/delete
+     * @param userDetails The currently authenticated user
+     * @param notificationId The ID of the notification to delete
+     * @return Redirect to the inbox view with a success message
      */
     @PostMapping("/{id}/delete")
     public String deleteNotification(@AuthenticationPrincipal LocalZeroUserDetails userDetails,

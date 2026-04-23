@@ -1,6 +1,5 @@
-package se.mau.localzero.messaging.service;
+package se.mau.localzero.messaging.mediator;
 
-import se.mau.localzero.domain.Message;
 import se.mau.localzero.domain.User;
 
 public interface CommunityMessagingMediator {

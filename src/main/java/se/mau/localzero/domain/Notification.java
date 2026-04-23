@@ -24,10 +24,10 @@ public class Notification {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(nullable = false, length = 500)
+    @Column(nullable = false, length = 200)
     private String title;
 
-    @Column(nullable = false, length = 3000)
+    @Column(nullable = false, length = 500)
     private String message;
 
     @Column(nullable = false, updatable = false)

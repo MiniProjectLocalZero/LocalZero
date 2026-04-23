@@ -9,10 +9,10 @@ import se.mau.localzero.messaging.command.MessageCommand;
 import se.mau.localzero.messaging.command.MessageCommandInvoker;
 import se.mau.localzero.messaging.exception.MessageNotFoundException;
 import se.mau.localzero.messaging.exception.UnauthorizedMessageAccessException;
+import se.mau.localzero.messaging.mediator.CommunityMessagingMediator;
 import se.mau.localzero.messaging.repository.MessageRepository;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Service class for handling message-related operations.
@@ -33,19 +33,6 @@ public class MessageService {
         this.mediator = mediator;
         this.messageRepository = messageRepository;
         this.messageCommandInvoker = messageCommandInvoker;
-    }
-
-    /**
-     * Send a message from sender to receiver.
-     * Delegates to the mediator which orchestrates validation, command execution, and notification.
-     *
-     * @param sender The user sending the message
-     * @param receiver The user receiving the message
-     * @param message The message content
-     */
-    @Transactional
-    public void sendMessage(User sender, User receiver, String message) {
-        mediator.sendMessage(sender, receiver, message);
     }
 
     /**
@@ -108,16 +95,45 @@ public class MessageService {
         messageRepository.save(message);
     }
 
+    /**
+     * Send a message from sender to receiver.
+     * Delegates to the mediator which orchestrates validation, command execution, and notification.
+     *
+     * @param sender The user sending the message
+     * @param receiver The user receiving the message
+     * @param message The message content
+     */
+    public void sendMessage(User sender, User receiver, String message) {
+        mediator.sendMessage(sender, receiver, message);
+    }
+
+    /**
+     * Get the inbox for a user.
+     * @param currentUser The user to get the inbox for
+     * @return A list of messages sent to the user, sorted by creation date (newest first)
+     */
     public List<Message> getInbox(User currentUser) {
-        Set<Message> inbox = currentUser.getReceivedMessages();
-        return inbox.stream().toList();
+        return messageRepository.findByReceiverOrderByCreatedAtDesc(currentUser.getId()).orElse(List.of());
     }
 
+    /**
+     * Get the conversation between two users.
+     * @param currentUser The user initiating the conversation
+     * @param otherUser The user participating in the conversation
+     * @return A list of messages in the conversation, sorted by creation date (oldest first)
+     */
     public List<Message> getConversation(User currentUser, User otherUser) {
-        return currentUser.getSentMessages().stream().filter(message -> message.getReceiver().equals(otherUser)).toList();
+        return messageRepository.findConversationBetween(currentUser.getId(), otherUser.getId()).orElse(List.of());
     }
 
+    /**
+     * Get the count of unread messages for a user.
+     * @param currentUser The user to get the count for
+     * @return The number of unread messages
+     */
     public int getUnreadCount(User currentUser) {
-        return currentUser.getNotifications().stream().filter(notification -> !notification.isRead()).toList().size();
+        return messageRepository.findByReceiverAndReadAtIsNull(currentUser.getId())
+                .map(List::size)
+                .orElse(0);
     }
 }

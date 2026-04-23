@@ -3,10 +3,11 @@ package se.mau.localzero.messaging.validator;
 import org.springframework.stereotype.Component;
 import se.mau.localzero.auth.repository.UserRepository;
 import se.mau.localzero.domain.Message;
+import se.mau.localzero.domain.Notification;
 import se.mau.localzero.messaging.exception.InvalidMessageException;
 
 @Component
-public class UserAccessValidator extends MessageValidator{
+public class UserAccessValidator extends Validator {
 
     private UserRepository userRepository;
 
@@ -35,6 +36,20 @@ public class UserAccessValidator extends MessageValidator{
 
         if (message.getSender().getId().equals(message.getReceiver().getId())) {
             throw new InvalidMessageException("Sender and receiver cannot be the same");
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean validate(Notification notification) {
+
+        if (notification.getRecipient() == null) {
+            throw new InvalidMessageException("Receiver cannot be null");
+        }
+
+        if (!userRepository.existsById(notification.getRecipient().getId())) {
+            throw new InvalidMessageException("Receiver does not exist");
         }
 
         return true;

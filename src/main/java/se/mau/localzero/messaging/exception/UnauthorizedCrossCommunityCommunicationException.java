@@ -8,9 +8,5 @@ public class UnauthorizedCrossCommunityCommunicationException extends RuntimeExc
     public UnauthorizedCrossCommunityCommunicationException(String message) {
         super(message);
     }
-
-    public UnauthorizedCrossCommunityCommunicationException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }
 

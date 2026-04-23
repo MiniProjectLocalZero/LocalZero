@@ -1,4 +1,4 @@
-package se.mau.localzero.messaging.service;
+package se.mau.localzero.messaging.mediator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,26 +17,30 @@ import se.mau.localzero.messaging.validator.ValidationChain;
 
 import java.util.Set;
 
+/**
+ * Default implementation of CommunityMessagingMediator.
+ * Orchestrates the workflow for sending messages between users, including validation of community rules, message content, and notification creation.
+ */
 @Service
 public class DefaultCommunityMessagingMediator implements CommunityMessagingMediator {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultCommunityMessagingMediator.class);
 
     private final MessageRepository messageRepository;
-    private final NotificationService notificationService;
+    private final NotificationMediator notificationMediator;
     private final InitiativeRepository initiativeRepository;
     private final MessageCommandInvoker messageCommandInvoker;
     private final ValidationChain validationChain;
 
     public DefaultCommunityMessagingMediator(
             MessageRepository messageRepository,
-            NotificationService notificationService,
+            NotificationMediator notificationMediator,
             InitiativeRepository initiativeRepository,
             MessageCommandInvoker messageCommandInvoker,
             ValidationChain validationChain
     ) {
         this.messageRepository = messageRepository;
-        this.notificationService = notificationService;
+        this.notificationMediator = notificationMediator;
         this.initiativeRepository = initiativeRepository;
         this.messageCommandInvoker = messageCommandInvoker;
         this.validationChain = validationChain;
@@ -108,8 +112,7 @@ public class DefaultCommunityMessagingMediator implements CommunityMessagingMedi
         logger.debug("Step 4: Creating notification");
         boolean isCrossCommunity = !sender.getCommunity().equals(receiver.getCommunity());
 
-        String messagePreview = content.length() > 100 ? content.substring(0, 100) + "..." : content;
-        notificationService.notifyNewMessage(sender, receiver, createdMessage, messagePreview, isCrossCommunity);
+        notificationMediator.sendMessageNotification(sender, receiver, createdMessage, isCrossCommunity);
         logger.debug("Step 4: Notification created ✓");
 
         logger.info("Message workflow completed successfully: {} → {}", sender.getUsername(), receiver.getUsername());

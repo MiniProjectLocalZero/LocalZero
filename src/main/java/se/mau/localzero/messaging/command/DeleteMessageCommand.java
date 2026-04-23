@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import se.mau.localzero.domain.Message;
 import se.mau.localzero.messaging.repository.MessageRepository;
-import se.mau.localzero.messaging.service.CommunityMessagingMediator;
 
 public class DeleteMessageCommand implements MessageCommand {
 

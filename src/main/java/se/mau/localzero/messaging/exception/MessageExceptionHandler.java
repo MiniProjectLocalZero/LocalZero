@@ -77,4 +77,15 @@ public class MessageExceptionHandler extends GlobalExceptionHandler {
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(UnauthorizedCrossCommunityCommunicationException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedCrossCommunityCommunicationException(UnauthorizedCrossCommunityCommunicationException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                "Unauthorized cross-community communication",
+                ex.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
 }

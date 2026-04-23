@@ -3,9 +3,9 @@ package se.mau.localzero.messaging.repository;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import se.mau.localzero.domain.Message;
-import se.mau.localzero.domain.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,38 +41,16 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     /**
      * Find all messages in a conversation between two users.
      * Excludes soft-deleted messages.
+     * Returns messages ordered by creation date (oldest first for conversation flow).
      *
-     * @param sender The sender user
-     * @param receiver The receiver user
-     * @return Optional list of messages in the conversation
+     * @param senderId The ID of the first user
+     * @param receiverId The ID of the second user
+     * @return Optional list of messages in the conversation (both directions)
      */
     @Query("SELECT m FROM Message m WHERE " +
             "((m.sender.id = :senderId AND m.receiver.id = :receiverId) OR " +
             "(m.sender.id = :receiverId AND m.receiver.id = :senderId)) " +
             "AND m.deletedAt IS NULL " +
             "ORDER BY m.createdAt ASC")
-    Optional<List<Message>> findConversationBetween(User sender, User receiver);
-
-    /**
-     * Save or update a message.
-     *
-     * @param message The message to save
-     * @return The saved message with generated ID if applicable
-     */
-    Message save(@NonNull Message message);
-
-    /**
-     * Hard delete a message (physically remove from database).
-     * Note: For soft deletes, use Message.markAsDeleted() and save() instead.
-     *
-     * @param message The message to delete
-     */
-    void delete(@NonNull Message message);
-
-    /**
-     * Find message by ID.
-     * @param messageId The ID of the message
-     * @return Optional containing the message if found, or empty if not found or soft-deleted
-     */
-    Optional<Message> findById(@NonNull Long messageId);
+    Optional<List<Message>> findConversationBetween(@Param("senderId") Long senderId, @Param("receiverId") Long receiverId);
 }
