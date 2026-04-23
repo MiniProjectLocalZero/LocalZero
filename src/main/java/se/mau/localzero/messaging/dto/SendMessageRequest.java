@@ -9,6 +9,6 @@ import se.mau.localzero.domain.User;
 @Service
 public class SendMessageRequest {
     private String content;
-    private User recipient;
+    private User receiver;
     private User sender;
 }

@@ -1,9 +1,9 @@
 package se.mau.localzero.messaging.validator;
 
 import org.springframework.stereotype.Component;
+import se.mau.localzero.auth.repository.UserRepository;
 import se.mau.localzero.domain.Message;
 import se.mau.localzero.messaging.exception.InvalidMessageException;
-import se.mau.localzero.repository.UserRepository;
 
 @Component
 public class UserAccessValidator extends MessageValidator{

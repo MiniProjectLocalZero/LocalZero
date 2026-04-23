@@ -7,6 +7,8 @@ import se.mau.localzero.domain.User;
 import se.mau.localzero.messaging.command.DeleteMessageCommand;
 import se.mau.localzero.messaging.command.MessageCommand;
 import se.mau.localzero.messaging.command.MessageCommandInvoker;
+import se.mau.localzero.messaging.exception.MessageNotFoundException;
+import se.mau.localzero.messaging.exception.UnauthorizedMessageAccessException;
 import se.mau.localzero.messaging.repository.MessageRepository;
 
 import java.util.List;
@@ -23,7 +25,11 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final MessageCommandInvoker messageCommandInvoker;
 
-    public MessageService(CommunityMessagingMediator mediator, MessageRepository messageRepository, MessageCommandInvoker messageCommandInvoker) {
+    public MessageService(
+            CommunityMessagingMediator mediator,
+            MessageRepository messageRepository,
+            MessageCommandInvoker messageCommandInvoker
+    ) {
         this.mediator = mediator;
         this.messageRepository = messageRepository;
         this.messageCommandInvoker = messageCommandInvoker;
@@ -36,44 +42,70 @@ public class MessageService {
      * @param sender The user sending the message
      * @param receiver The user receiving the message
      * @param message The message content
-     * @return The created Message entity
      */
     @Transactional
-    public Message sendMessage(User sender, User receiver, String message) {
-        return mediator.sendMessage(sender, receiver, message);
+    public void sendMessage(User sender, User receiver, String message) {
+        mediator.sendMessage(sender, receiver, message);
     }
 
     /**
      * Delete a message. Soft deletion is used to preserve message history.
-     * @param message The message to delete
-     * @return True if the message was deleted, false otherwise
+     * @param messageId The message to delete
+     * @param currentUser The user attempting to delete the message (must be sender or receiver)
+     * @throws MessageNotFoundException if message not found
+     * @throws UnauthorizedMessageAccessException if user is not sender or receiver
      */
     @Transactional(readOnly = false)
-    public boolean deleteMessage (Message message) {
+    public void deleteMessage(Long messageId, User currentUser) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
+
+        if (!message.getSender().equals(currentUser) && !message.getReceiver().equals(currentUser)) {
+            throw new UnauthorizedMessageAccessException("Unauthorized: You can only delete messages you sent or received");
+        }
+
         MessageCommand command = new DeleteMessageCommand(message, messageRepository);
-        return messageCommandInvoker.execute(command);
+        messageCommandInvoker.execute(command);
     }
 
     /**
      * Mark a message as read.
-     * @param message The message to mark as read
-     * @return True if the message was found and updated, false otherwise
+     * @param messageId The message to mark as read
+     * @param currentUser The user attempting to mark the message
+     * @throws MessageNotFoundException if message not found
+     * @throws UnauthorizedMessageAccessException if user is not the receiver
      */
     @Transactional(readOnly = false)
-    public boolean markAsRead (Message message) {
+    public void markMessageAsRead(Long messageId, User currentUser) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
+
+        if (!message.getReceiver().equals(currentUser)) {
+            throw new UnauthorizedMessageAccessException("Unauthorized: You can only mark your own received messages as read");
+        }
+
         message.markAsRead();
-        return messageRepository.save(message) != null;
+        messageRepository.save(message);
     }
 
     /**
      * Mark a message as unread.
-     * @param message The message to mark as unread
-     * @return True if the message was found and updated, false otherwise
+     * @param messageId The message to mark as unread
+     * @param currentUser The user attempting to mark the message
+     * @throws MessageNotFoundException if message not found
+     * @throws UnauthorizedMessageAccessException if user is not the receiver
      */
     @Transactional(readOnly = false)
-    public boolean markAsUnread (Message message) {
+    public void markMessageAsUnread(Long messageId, User currentUser) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
+
+        if (!message.getReceiver().equals(currentUser)) {
+            throw new UnauthorizedMessageAccessException("Unauthorized: You can only mark your own received messages as unread");
+        }
+
         message.markAsUnread();
-        return messageRepository.save(message) != null;
+        messageRepository.save(message);
     }
 
     public List<Message> getInbox(User currentUser) {
@@ -83,5 +115,9 @@ public class MessageService {
 
     public List<Message> getConversation(User currentUser, User otherUser) {
         return currentUser.getSentMessages().stream().filter(message -> message.getReceiver().equals(otherUser)).toList();
+    }
+
+    public int getUnreadCount(User currentUser) {
+        return currentUser.getNotifications().stream().filter(notification -> !notification.isRead()).toList().size();
     }
 }

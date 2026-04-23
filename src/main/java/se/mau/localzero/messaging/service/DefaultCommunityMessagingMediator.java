@@ -7,13 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import se.mau.localzero.domain.Initiative;
 import se.mau.localzero.domain.Message;
 import se.mau.localzero.domain.User;
+import se.mau.localzero.initiative.repository.InitiativeRepository;
 import se.mau.localzero.messaging.command.MessageCommandInvoker;
 import se.mau.localzero.messaging.command.SendMessageCommand;
 import se.mau.localzero.messaging.exception.InvalidMessageException;
 import se.mau.localzero.messaging.exception.UnauthorizedCrossCommunityCommunicationException;
 import se.mau.localzero.messaging.repository.MessageRepository;
 import se.mau.localzero.messaging.validator.ValidationChain;
-import se.mau.localzero.repository.InitiativeRepository;
 
 import java.util.Set;
 
@@ -69,7 +69,7 @@ public class DefaultCommunityMessagingMediator implements CommunityMessagingMedi
 
     @Override
     @Transactional
-    public Message sendMessage(User sender, User receiver, String content) {
+    public boolean sendMessage(User sender, User receiver, String content) {
         logger.info("Starting message workflow: {} → {}", sender.getUsername(), receiver.getUsername());
 
         logger.debug("Step 1: Validating community rules");
@@ -100,27 +100,19 @@ public class DefaultCommunityMessagingMediator implements CommunityMessagingMedi
 
         boolean commandExecuted = messageCommandInvoker.execute(command);
         if (!commandExecuted) {
-            throw new RuntimeException("Failed to execute SendMessageCommand");
+            throw new InvalidMessageException("Failed to execute SendMessageCommand");
         }
-
         Message createdMessage = command.getCreatedMessage();
-        if (createdMessage == null) {
-            throw new RuntimeException("Message was not created by command");
-        }
         logger.debug("Step 3: Message created and saved ✓");
 
         logger.debug("Step 4: Creating notification");
         boolean isCrossCommunity = !sender.getCommunity().equals(receiver.getCommunity());
-        notificationService.notifyNewMessage(sender, receiver, content, isCrossCommunity);
+
+        String messagePreview = content.length() > 100 ? content.substring(0, 100) + "..." : content;
+        notificationService.notifyNewMessage(sender, receiver, createdMessage, messagePreview, isCrossCommunity);
         logger.debug("Step 4: Notification created ✓");
 
         logger.info("Message workflow completed successfully: {} → {}", sender.getUsername(), receiver.getUsername());
-        return createdMessage;
-    }
-
-    @Override
-    public boolean requiresRepresentative(User sender, User receiver) {
-        // Returns true if sender and receiver are in different communities
-        return !sender.getCommunity().equals(receiver.getCommunity());
+        return true;
     }
 }

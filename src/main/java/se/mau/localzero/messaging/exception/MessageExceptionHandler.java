@@ -2,12 +2,14 @@ package se.mau.localzero.messaging.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import se.mau.localzero.exception.ErrorResponse;
 import se.mau.localzero.exception.GlobalExceptionHandler;
 
 import java.time.LocalDateTime;
 
+@ControllerAdvice
 public class MessageExceptionHandler extends GlobalExceptionHandler {
 
     @Override
@@ -60,6 +62,17 @@ public class MessageExceptionHandler extends GlobalExceptionHandler {
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND.value(),
                 "Conversation not found",
+                ex.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MessageNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleMessageNotFoundException(MessageNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Message not found",
                 ex.getMessage()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);

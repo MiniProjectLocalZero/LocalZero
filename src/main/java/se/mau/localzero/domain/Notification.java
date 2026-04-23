@@ -1,15 +1,6 @@
 package se.mau.localzero.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -49,9 +40,18 @@ public class Notification {
     @JoinColumn(name = "recipient_id", nullable = false)
     private User recipient;
 
-    public Notification(String title, String message, User recipient) {
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private NotificationEntityType entityType;
+
+    @Column(nullable = false)
+    private Long entityId;
+
+    public Notification(String title, String message, User recipient, NotificationEntityType entityType, Long entityId) {
         this.title = title;
         this.message = message;
+        this.entityType = entityType;
+        this.entityId = entityId;
         setRecipient(recipient);
     }
 
@@ -71,6 +71,10 @@ public class Notification {
 
     public void markAsUnread() {
         this.readAt = null;
+    }
+
+    public boolean isRead() {
+        return this.readAt != null;
     }
 
     @PrePersist

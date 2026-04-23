@@ -7,7 +7,5 @@ public interface CommunityMessagingMediator {
 
    boolean canSendMessage(User sender, User receiver);
 
-   Message sendMessage(User sender, User receiver, String content);
-
-   boolean requiresRepresentative(User sender, User receiver);
+   boolean sendMessage(User sender, User receiver, String content);
 }

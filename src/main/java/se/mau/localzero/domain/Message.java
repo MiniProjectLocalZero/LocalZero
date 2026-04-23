@@ -124,6 +124,10 @@ public class Message {
         this.readAt = null;
     }
 
+    public boolean isRead() {
+        return this.readAt != null;
+    }
+
     /**
      * Mark this message as deleted (soft delete).
      * Sets the deletedAt timestamp to the current time.

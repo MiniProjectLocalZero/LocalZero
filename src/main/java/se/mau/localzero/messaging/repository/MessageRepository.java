@@ -1,5 +1,8 @@
 package se.mau.localzero.messaging.repository;
 
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import se.mau.localzero.domain.Message;
 import se.mau.localzero.domain.User;
@@ -16,7 +19,7 @@ import java.util.Optional;
  * @Author Carl Lundholm
  */
 @Repository
-public interface MessageRepository {
+public interface MessageRepository extends JpaRepository<Message, Long> {
     /**
      * Find all unread messages for a specific receiver.
      * Excludes soft-deleted messages.
@@ -43,6 +46,11 @@ public interface MessageRepository {
      * @param receiver The receiver user
      * @return Optional list of messages in the conversation
      */
+    @Query("SELECT m FROM Message m WHERE " +
+            "((m.sender.id = :senderId AND m.receiver.id = :receiverId) OR " +
+            "(m.sender.id = :receiverId AND m.receiver.id = :senderId)) " +
+            "AND m.deletedAt IS NULL " +
+            "ORDER BY m.createdAt ASC")
     Optional<List<Message>> findConversationBetween(User sender, User receiver);
 
     /**
@@ -51,7 +59,7 @@ public interface MessageRepository {
      * @param message The message to save
      * @return The saved message with generated ID if applicable
      */
-    Message save(Message message);
+    Message save(@NonNull Message message);
 
     /**
      * Hard delete a message (physically remove from database).
@@ -59,13 +67,12 @@ public interface MessageRepository {
      *
      * @param message The message to delete
      */
-    void delete(Message message);
+    void delete(@NonNull Message message);
 
     /**
-     * Update an existing message.
-     *
-     * @param message The message to update
-     * @return The updated message
+     * Find message by ID.
+     * @param messageId The ID of the message
+     * @return Optional containing the message if found, or empty if not found or soft-deleted
      */
-    Message update(Message message);
+    Optional<Message> findById(@NonNull Long messageId);
 }
