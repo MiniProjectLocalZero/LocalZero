@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Log in - LocalZero</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <link rel="stylesheet" th:href="@{/navbar.css}">
+
+</head>
+
+<body>
+<div th:replace="fragments/navbar :: navbar"></div>
+
+<div class="profile-container">
+    <div class="profile-header">
+        <h1 id="my-profile">My Profile</h1>
+        <div class="profile-btn">
+            <button class="profile-header-button">+ Create a post</button>
+            <button class="profile-header-button">Edit Profile</button>
+        </div>
+
+        <div class="profile-info" sec:authorize="isAuthenticated()">
+            <h2> <span><strong sec:authentication="name"></strong></span></h2>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

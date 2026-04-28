@@ -46,7 +46,7 @@
 
                 <div class="admin-actions" th:if="${init.createdBy?.username == #authentication.name}">
                     <form th:action="@{/initiatives/{id}/delete(id=${init.id})}" method="post"
-                          onsubmit="return confirm('Vill du verkligen ta bort detta initiativ?');">
+                          onsubmit="return confirm('Do you really want to delete this initiative?');">
                         <button type="submit" class="btn-delete-link">Delete</button>
                     </form>
                 </div>

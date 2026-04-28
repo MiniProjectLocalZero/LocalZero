@@ -416,3 +416,46 @@ p {
     cursor: pointer;
     user-select: none;
 }
+
+.container {
+    display: flex;
+    flex-direction: row;
+}
+
+.profile-header {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.profile-btn{
+    margin-left: auto;
+    margin-top: 40px;
+    margin-right: 8px;
+    display: flex;
+    flex-direction: row;
+}
+
+.profile-header-button{
+    background-color: #8DB392;
+    color: white;
+    width: 70%;
+    padding: 2px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 100;
+    margin-top: 10px;
+    margin-left: 15px;
+    transition: background-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.profile-header-button:hover {
+    background-color: #729676;
+}
+
+#my-profile{
+    margin-top: 40px;
+    margin-left: 30px;
+}
