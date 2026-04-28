@@ -1,11 +1,11 @@
 package se.mau.localzero.initiative.service;
 
 import org.springframework.stereotype.Service;
+import se.mau.localzero.domain.Community;
 import se.mau.localzero.domain.Initiative;
 import se.mau.localzero.domain.User;
-import se.mau.localzero.domain.Community;
 import se.mau.localzero.initiative.dto.InitiativeDto;
-import se.mau.localzero.initiative.factory.InitiativeFactory;
+import se.mau.localzero.initiative.factory.InitiativeFactoryRegistry;
 import se.mau.localzero.initiative.repository.InitiativeRepository;
 
 import java.util.List;
@@ -15,15 +15,15 @@ import java.util.List;
 @Service
 public class InitiativeService {
     private final InitiativeRepository initiativeRepository;
-    private final InitiativeFactory initiativeFactory;
+    private final InitiativeFactoryRegistry initiativeFactoryRegistry;
 
-    public InitiativeService(InitiativeRepository repo, InitiativeFactory factory) {
+    public InitiativeService(InitiativeRepository repo, InitiativeFactoryRegistry initiativeFactoryRegistry) {
         this.initiativeRepository = repo;
-        this.initiativeFactory = factory;
+        this.initiativeFactoryRegistry = initiativeFactoryRegistry;
     }
 
     public Initiative saveNewInitiative(InitiativeDto dto, User creator, Community community) {
-        Initiative initiative = initiativeFactory.createInitiative(dto, creator, community);
+        Initiative initiative = initiativeFactoryRegistry.create(dto, creator, community);
         return initiativeRepository.save(initiative);
     }
 
