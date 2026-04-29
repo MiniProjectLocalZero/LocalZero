@@ -56,7 +56,7 @@ public class User {
     @JoinColumn(name = "community_id", nullable = false)
     private Community community;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role", nullable = false)
