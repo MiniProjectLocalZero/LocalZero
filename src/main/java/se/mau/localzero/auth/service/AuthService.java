@@ -51,4 +51,16 @@ public class AuthService {
             userRepository.save(newUser);
         }
     }
+
+    /**
+     * Get a user by ID.
+     *
+     * @param userId The user ID
+     * @return The User entity
+     * @throws RuntimeException if user not found
+     */
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+    }
 }

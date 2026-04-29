@@ -40,8 +40,12 @@ public class Post {
     private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "initiative_id", nullable = false)
+    @JoinColumn(name = "initiative_id")
     private Initiative initiative;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "community_id")
+    private Community community;
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
@@ -74,6 +78,49 @@ public class Post {
         if (initiative != null) {
             initiative.getPosts().add(this);
         }
+    }
+
+    public void setCommunity(Community community) {
+        if (this.community != null) {
+            this.community.removePost(this);
+        }
+        this.community = community;
+        if (community != null) {
+            community.addPost(this);
+        }
+    }
+
+    /**
+     * Validate that post is associated with either a community or initiative, but not both.
+     * @throws IllegalStateException if both or neither community and initiative are set
+     */
+    public void validateScope() {
+        boolean hasInitiative = this.initiative != null;
+        boolean hasCommunity = this.community != null;
+
+        if (hasInitiative && hasCommunity) {
+            throw new IllegalStateException("Post cannot be in both an initiative and a community");
+        }
+
+        if (!hasInitiative && !hasCommunity) {
+            throw new IllegalStateException("Post must be in either an initiative or a community");
+        }
+    }
+
+    /**
+     * Get the scope (container) of this post - either initiative or community.
+     * @return the Initiative if post is in an initiative, or Community if post is in a community
+     */
+    public Object getScope() {
+        return initiative != null ? initiative : community;
+    }
+
+    /**
+     * Check if this post is in an initiative.
+     * @return true if post is in an initiative, false if in a community
+     */
+    public boolean isInInitiative() {
+        return initiative != null;
     }
 
     public void addComment(Comment comment) {
