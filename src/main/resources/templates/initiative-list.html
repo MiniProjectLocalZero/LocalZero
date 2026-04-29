@@ -1,39 +1,59 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Create Initiative</title>
+    <title>Community Feed - LocalZero</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
     <link rel="stylesheet" th:href="@{/navbar.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <script th:src="@{/js/initiative.js}" defer></script>
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
-<div class="center-screen-wrapper">
 
-    <div class="initiatives-container">
-        <div th:each="init : ${initiatives}" class="initiative-card">
-            <div class="card-content">
-                <span class="badge" th:text="${init.category}">Category</span>
-                <h3 th:text="${init.title}">Title</h3>
-                <p th:text="${init.description}">Description</p>
+<div class="initiatives-feed">
+
+    <div th:each="init : ${initiatives}" class="initiative-card">
+
+        <div class="card-header">
+            <div class="header-text">
+                <h4 th:text="${init.community.name}">Malmö Community</h4>
+                <p class="meta-info">
+                    <span th:text="${init.createdBy?.username}">Username</span> •
+                    <span th:text="${#temporals.format(init.createdAt, 'dd MMMM yyyy')}">14 April 2026</span>
+                </p>
             </div>
+        </div>
 
-            <div class="card-footer">
-                <div class="stats">
-                <span class="stat-item">
-                    <i class="fas fa-heart"></i> 0
-                </span>
-                    <span class="stat-item">
-                    <i class="fas fa-comment"></i> Updates
-                </span>
-                </div>
+        <div class="card-body">
+            <h3 th:text="${init.title}">Title of the Initiative</h3>
+            <p th:text="${init.description}">Descirption...</p>
+        </div>
 
-                <div class="actions">
-                    <button class="btn-join" title="Join Initiative">+</button>
-                    <a th:href="@{/initiatives/{id}(id=${init.id})}" class="btn-details">View</a>
+        <div class="card-footer">
+            <div class="engagement">
+               <span class="metric like-container" th:data-id="${init.id}" onclick="toggleLike(this)">
+                    <i th:class="${init.participants.contains(#authentication.principal) ? 'fas fa-heart heart-icon liked' : 'far fa-heart heart-icon'}"></i>
+                    <span class="like-count" th:text="${init.participants.size()}">0</span> likes
+               </span>
+
+                <button class="btn-join-action">
+                    <i class="fas fa-plus"></i> Join initiative
+                </button>
+
+                <div class="admin-actions" th:if="${init.createdBy?.username == #authentication.name}">
+                    <form th:action="@{/initiatives/{id}/delete(id=${init.id})}" method="post"
+                          onsubmit="return confirm('Vill du verkligen ta bort detta initiativ?');">
+                        <button type="submit" class="btn-delete-link">Delete</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 </body>
+</html>

@@ -1,6 +1,8 @@
 package se.mau.localzero.initiative.repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,6 +18,10 @@ import java.util.Set;
  */
 @Repository
 public interface InitiativeRepository extends JpaRepository<Initiative, Long> {
+
+    //gets public initiative or initiatives from the same community
+    @Query("SELECT i FROM Initiative i WHERE i.visibility = 'PUBLIC' OR i.community.id = :communityId")
+    List<Initiative> findVisibleInitiatives(Long communityId);
 
     List<Initiative> findByCommunityId(Long communityId);
 

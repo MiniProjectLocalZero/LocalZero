@@ -12,8 +12,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     position: sticky;
+    position: relative;
     top: 0;
     z-index: 1000;
 }
@@ -21,9 +21,44 @@ body {
 .logged-in-as {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
 }
 
 #logged-in-span {
     font-size: 1.1em;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+
+}
+
+.icon-button {
+    right: auto;
+    cursor:pointer;
+    color: var(--dark-green-color);
+}
+
+.icon-button:hover {
+    color: var(--light-sand-color);
+}
+
+.icon svg{
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+
+#logout-btn {
+    color: var(--light-sand-color);
+    background-color: var(--dark-green-color);
+    border: var(--light-sand-color);
+    cursor: pointer;
+    font-size: 18px;
+}
+
+#logout-btn:hover {
+    background-color: var(--light-sand-color);
+    color: var(--dark-green-color);
 }
