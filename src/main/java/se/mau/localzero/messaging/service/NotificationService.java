@@ -72,7 +72,7 @@ public class NotificationService {
         }
 
         return notificationRepository
-                .findByRecipientOrderByCreatedAtDesc(recipient.getId())
+                .findByRecipientIdOrderByCreatedAtDesc(recipient.getId())
                 .orElse(List.of());
     }
 
@@ -89,24 +89,12 @@ public class NotificationService {
         }
 
         return notificationRepository
-                .findByRecipientAndReadAtIsNull(recipient.getId())
+                .findByRecipientIdAndReadAtIsNull(recipient.getId())
                 .orElse(List.of());
     }
 
-    /**
-     * Get count of unread notifications for a user.
-     *
-     * @param recipient The user
-     * @return Count of unread notifications
-     * @throws NotificationValidationException if recipient is invalid
-     */
     public long getUnreadNotificationCount(User recipient) {
-        if (recipient == null || recipient.getId() == null) {
-            throw new NotificationValidationException("Recipient must be valid");
-        }
-
-        List<Notification> unreadNotifications = getUnreadNotifications(recipient);
-        return unreadNotifications.size();
+        return getUnreadNotifications(recipient).size();
     }
 
     /**
