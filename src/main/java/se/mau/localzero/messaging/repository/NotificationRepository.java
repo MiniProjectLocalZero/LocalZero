@@ -19,21 +19,9 @@ import java.util.Optional;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    /**
-     * Find all unread notifications for a recipient, ordered by creation date (newest first).
-     */
-    Optional<List<Notification>> findByRecipientAndReadAtIsNull(Long recipientId);
+    Optional<List<Notification>> findByRecipientIdAndReadAtIsNull(Long recipientId);
 
-    /**
-     * Find all notifications for a recipient, ordered by creation date (newest first).
-     */
-    Optional<List<Notification>> findByRecipientOrderByCreatedAtDesc(Long recipientId);
+    Optional<List<Notification>> findByRecipientIdOrderByCreatedAtDesc(Long recipientId);
 
-    /**
-     * Find all notifications for a specific recipient and entity type, ordered by creation date (newest first).
-     * @param recipient The recipient
-     * @param entityType The entity type
-     * @return List of notifications
-     */
     Optional<List<Notification>> findByRecipientAndEntityTypeOrderByCreatedAtDesc(User recipient, NotificationEntityType entityType);
 }

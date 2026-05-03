@@ -27,7 +27,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
      * @param receiverId The ID of the receiver
      * @return Optional list of unread messages
      */
-    Optional<List<Message>> findByReceiverAndReadAtIsNull(Long receiverId);
+    Optional<List<Message>> findByReceiverIdAndReadAtIsNull(Long receiverId);
 
     /**
      * Find all messages for a specific receiver, ordered by creation date (newest first).
@@ -36,7 +36,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
      * @param receiverId The ID of the receiver
      * @return Optional list of messages
      */
-    Optional<List<Message>> findByReceiverOrderByCreatedAtDesc(Long receiverId);
+    Optional<List<Message>> findByReceiverIdOrderByCreatedAtDesc(Long receiverId);
 
     /**
      * Find all messages in a conversation between two users.

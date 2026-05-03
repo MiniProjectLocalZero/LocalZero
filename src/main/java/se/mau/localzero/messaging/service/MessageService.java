@@ -113,7 +113,7 @@ public class MessageService {
      * @return A list of messages sent to the user, sorted by creation date (newest first)
      */
     public List<Message> getInbox(User currentUser) {
-        return messageRepository.findByReceiverOrderByCreatedAtDesc(currentUser.getId()).orElse(List.of());
+        return messageRepository.findByReceiverIdOrderByCreatedAtDesc(currentUser.getId()).orElse(List.of());
     }
 
     /**
@@ -132,7 +132,7 @@ public class MessageService {
      * @return The number of unread messages
      */
     public int getUnreadCount(User currentUser) {
-        return messageRepository.findByReceiverAndReadAtIsNull(currentUser.getId())
+        return messageRepository.findByReceiverIdAndReadAtIsNull(currentUser.getId())
                 .map(List::size)
                 .orElse(0);
     }
