@@ -63,6 +63,8 @@ body {
     color: var(--dark-green-color);
 }
 
+/* --- NOTIFIKATIONER --- */
+
 .notification-container {
     position: relative;
     display: inline-flex;
@@ -85,5 +87,87 @@ body {
     align-items: center;
     justify-content: center;
     padding: 0 4px;
-    border: 2px solid white;
+    /* Uppdaterad till er ljusgröna för att smälta in snyggt i navbaren */
+    border: 2px solid var(--light-green-color);
+}
+
+/* Dropdown-boxen */
+.notification-dropdown {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    width: 280px;
+    background-color: var(--light-sand-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    overflow: hidden;
+    color: var(--dark-green-color);
+    border: 1px solid var(--dark-sand-color);
+}
+
+.notification-dropdown.hidden {
+    display: none;
+}
+
+.dropdown-header {
+    background-color: var(--dark-sand-color);
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--dark-green-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-header h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--dark-green-color);
+}
+
+.dropdown-header a {
+    font-size: 12px;
+    color: var(--dark-green-color);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.dropdown-header a:hover {
+    text-decoration: underline;
+}
+
+.notification-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--dark-sand-color);
+    font-size: 13px;
+    cursor: pointer;
+    background-color: var(--light-sand-color);
+    color: var(--dark-green-color);
+    transition: filter 0.2s;
+}
+
+.notification-item:hover {
+    filter: brightness(1.05);
+}
+
+/* Olästa notifikationer */
+.notification-item.unread {
+    background-color: var(--light-green-color);
+    color: white;
+}
+
+.notification-item.unread .time {
+    color: var(--light-sand-color);
+}
+
+.notification-item p {
+    margin: 0 0 5px 0;
+    line-height: 1.4;
+}
+
+.notification-item .time {
+    font-size: 11px;
+    color: var(--dark-green-color);
+    opacity: 0.8;
 }
