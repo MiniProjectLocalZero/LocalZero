@@ -40,7 +40,7 @@ public class DefaultCommunityMessagingMediator implements CommunityMessagingMedi
 
     @Override
     @Transactional
-    public boolean sendMessage(User sender, User receiver, String content) {
+    public void sendMessage(User sender, User receiver, String content) {
         logger.info("Starting message workflow: {} → {}", sender.getUsername(), receiver.getUsername());
 
         logger.debug("Step 2: Validating");
@@ -74,6 +74,5 @@ public class DefaultCommunityMessagingMediator implements CommunityMessagingMedi
         logger.debug("Step 4: Notification created ✓");
 
         logger.info("Message workflow completed successfully: {} → {}", sender.getUsername(), receiver.getUsername());
-        return true;
     }
 }

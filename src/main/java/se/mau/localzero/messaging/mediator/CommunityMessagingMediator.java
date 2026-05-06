@@ -4,5 +4,5 @@ import se.mau.localzero.domain.User;
 
 public interface CommunityMessagingMediator {
 
-   boolean sendMessage(User sender, User receiver, String content);
+   void sendMessage(User sender, User receiver, String content);
 }

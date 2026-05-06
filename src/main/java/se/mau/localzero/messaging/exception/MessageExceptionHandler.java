@@ -23,17 +23,6 @@ public class MessageExceptionHandler extends GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(MessageException.class)
-    public ResponseEntity<ErrorResponse> handleMessageException(MessageException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Message error",
-                ex.getMessage()
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(InvalidMessageException.class)
     public ResponseEntity<ErrorResponse> handleInvalidMessageException(InvalidMessageException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
@@ -54,17 +43,6 @@ public class MessageExceptionHandler extends GlobalExceptionHandler {
                 ex.getMessage()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(ConversationNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleConversationNotFoundException(ConversationNotFoundException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                "Conversation not found",
-                ex.getMessage()
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MessageNotFoundException.class)
