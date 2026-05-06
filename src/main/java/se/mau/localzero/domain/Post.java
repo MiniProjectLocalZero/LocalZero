@@ -32,6 +32,13 @@ public class Post {
     @Column
     private String imageUrl;
 
+    @Lob
+    @Column(name = "image_data")
+    private byte[] imageData;
+
+    @Column(name = "image_content_type")
+    private String imageContentType;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -49,9 +56,11 @@ public class Post {
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private Set<Like> likes = new HashSet<>();
 
-    public Post(String content, String imageUrl, User author, Initiative initiative) {
+    public Post(String content, String imageUrl, byte[] imageData, String imageContentType, User author, Initiative initiative) {
         this.content = content;
         this.imageUrl = imageUrl;
+        this.imageData = imageData;
+        this.imageContentType = imageContentType;
         setAuthor(author);
         setInitiative(initiative);
     }

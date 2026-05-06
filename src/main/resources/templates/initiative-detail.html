@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${initiative.title}">Initiative Detail</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <link rel="stylesheet" th:href="@{/navbar.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="center-screen-wrapper">
+    <div class="container">
+        <div class="initiative-header">
+            <span class="badge" th:text="${initiative.category}">Category</span>
+            <h1 th:text="${initiative.title}">Title</h1>
+            <p th:text="${initiative.description}">Description</p>
+            <div class="initiative-meta">
+                <span th:text="'Start: ' + ${initiative.startDate}">Start</span>
+                <span th:text="'End: ' + ${initiative.endDate}">End</span>
+                <span th:text="'Visibility: ' + ${initiative.visibility}">Visibility</span>
+            </div>
+
+            <div class="actions" style="margin-top: 15px;">
+                <form th:action="@{/initiatives/{id}/likes(id=${initiative.id})}" method="post" style="display:inline;">
+                    <button type="submit" style="padding: 5px 10px; border: 1px solid #333; background: #fff; cursor: pointer; font-weight: bold;">
+                        <span th:text="${userLikedInitiative != null && userLikedInitiative} ? 'Dislike' : 'Like'">Like</span>
+                        <span th:text="'(' + ${initiativeLikeCount} + ')'">(0)</span>
+                    </button>
+                </form>
+                <form th:if="${currentUser != null and !#sets.contains(initiative.participants, currentUser) and initiative.createdBy != currentUser}"
+                      th:action="@{/initiatives/{id}/join(id=${initiative.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn-join" title="Join Initiative">+</button>
+                </form>
+                <form th:if="${currentUser != null and #sets.contains(initiative.participants, currentUser)}"
+                      th:action="@{/initiatives/{id}/leave(id=${initiative.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn-join" title="Leave Initiative">−</button>
+                </form>
+                <a th:href="@{/initiatives}" class="btn-details">Back to Initiatives</a>
+            </div>
+        </div>
+
+        <div th:if="${param.error}" class="error">
+            <p th:text="${param.error}">An error occurred.</p>
+        </div>
+        <div th:if="${param.posted}" class="success">
+            <p>Update posted successfully!</p>
+        </div>
+        <div th:if="${param.commented}" class="success">
+            <p>Comment added!</p>
+        </div>
+        <div th:if="${param.liked}" class="success">
+            <p>Like updated!</p>
+        </div>
+
+        <div class="post-form-wrapper" th:if="${currentUser != null and (#sets.contains(initiative.participants, currentUser) or initiative.createdBy == currentUser)}">
+            <h3>Post an Update</h3>
+            <form th:action="@{/initiatives/{id}/posts(id=${initiative.id})}" th:object="${postDto}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="content">Message:</label>
+                    <textarea id="content" th:field="*{content}" placeholder="Share an update..." required maxlength="5000"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="image">Image (optional):</label>
+                    <input type="file" id="image" th:field="*{image}" accept="image/*">
+                </div>
+                <button type="submit" class="btn">Post Update</button>
+            </form>
+        </div>
+
+        <div class="posts-feed">
+            <h3>Updates</h3>
+            <div th:if="${#lists.isEmpty(posts)}" class="no-posts">
+                <p>No updates yet.</p>
+            </div>
+            <div th:each="post : ${posts}" class="post-card">
+                <div class="post-meta">
+                    <strong th:text="${post.author.username}">Author</strong>
+                    <span th:text="${post.createdAt}">Date</span>
+                </div>
+                <p th:text="${post.content}">Content</p>
+                <img th:if="${post.imageData != null}" th:src="@{/posts/{id}/image(id=${post.id})}" class="post-image" alt="Post image">
+
+                <div class="post-actions" style="margin-top: 10px;">
+                    <form th:action="@{/initiatives/{iid}/posts/{pid}/likes(iid=${initiative.id},pid=${post.id})}" method="post" style="display:inline;">
+                        <button type="submit" style="padding: 5px 10px; border: 1px solid #333; background: #fff; cursor: pointer; font-weight: bold;">
+                            <span th:text="${likedPostIds != null && likedPostIds.contains(post.id)} ? 'Dislike' : 'Like'">Like</span>
+                            <span th:text="'(' + ${#sets.size(post.likes)} + ')'">(0)</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="comments-section" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #ddd;">
+                    <h4 th:text="'Comments (' + ${#sets.size(post.comments)} + ')'">Comments (0)</h4>
+                    <div th:if="${#sets.isEmpty(post.comments)}" class="no-comments">
+                        <p style="font-size: 0.9em; color: #666;">No comments yet.</p>
+                    </div>
+                    <div th:each="comment : ${post.comments}" class="comment" style="margin-bottom: 10px;">
+                        <div class="comment-meta" style="font-size: 0.85em; color: #555;">
+                            <strong th:text="${comment.author.username}">Author</strong>
+                            <span th:text="${comment.createdAt}">Date</span>
+                        </div>
+                        <p th:text="${comment.content}" style="margin: 2px 0;">Content</p>
+                        <form th:action="@{/initiatives/{iid}/posts/{pid}/comments/{cid}/likes(iid=${initiative.id},pid=${post.id},cid=${comment.id})}" method="post" style="display:inline;">
+                            <button type="submit" style="padding: 4px 8px; border: 1px solid #333; background: #fff; cursor: pointer; font-weight: bold; font-size: 0.9em;">
+                                <span th:text="${likedCommentIds != null && likedCommentIds.contains(comment.id)} ? 'Dislike' : 'Like'">Like</span>
+                                <span th:text="'(' + ${commentLikeCounts != null ? commentLikeCounts.get(comment.id) : 0} + ')'">(0)</span>
+                            </button>
+                        </form>
+                    </div>
+                    <form th:if="${currentUser != null}" th:action="@{/initiatives/{iid}/posts/{pid}/comments(iid=${initiative.id},pid=${post.id})}" method="post" style="margin-top: 10px;">
+                        <textarea name="content" placeholder="Add a comment..." required maxlength="3000" style="width: 100%; padding: 8px; box-sizing: border-box;"></textarea>
+                        <button type="submit" class="btn" style="margin-top: 5px;">Comment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

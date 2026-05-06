@@ -20,12 +20,15 @@
 
             <div class="card-footer">
                 <div class="stats">
-                <span class="stat-item">
-                    <i class="fas fa-heart"></i> 0
-                </span>
+                    <form th:action="@{/initiatives/{id}/likes(id=${init.id})}" method="post" style="display:inline;">
+                        <button type="submit" style="padding: 5px 10px; border: 1px solid #333; background: #fff; cursor: pointer; font-weight: bold;">
+                            <span th:text="${likedInitiativeIds != null && likedInitiativeIds.contains(init.id)} ? 'Dislike' : 'Like'">Like</span>
+                            <span th:text="'(' + ${initiativeLikeCounts != null ? initiativeLikeCounts.get(init.id) : 0} + ')'">(0)</span>
+                        </button>
+                    </form>
                     <span class="stat-item">
-                    <i class="fas fa-comment"></i> Updates
-                </span>
+                        <i class="fas fa-comment"></i> Updates
+                    </span>
                 </div>
 
                 <div class="actions">

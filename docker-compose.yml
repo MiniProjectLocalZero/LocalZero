@@ -32,6 +32,12 @@ services:
       DB_PASSWORD: localzero
     ports:
       - "8080:8080"
+    develop:
+      watch:
+        - action: rebuild
+          path: ./src
+        - action: rebuild
+          path: ./pom.xml
 
 volumes:
   postgres-data:
