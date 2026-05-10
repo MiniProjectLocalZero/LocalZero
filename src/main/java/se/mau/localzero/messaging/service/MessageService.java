@@ -12,7 +12,10 @@ import se.mau.localzero.messaging.exception.UnauthorizedMessageAccessException;
 import se.mau.localzero.messaging.mediator.CommunityMessagingMediator;
 import se.mau.localzero.messaging.repository.MessageRepository;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service class for handling message-related operations.
@@ -56,26 +59,6 @@ public class MessageService {
     }
 
     /**
-     * Mark a message as read.
-     * @param messageId The message to mark as read
-     * @param currentUser The user attempting to mark the message
-     * @throws MessageNotFoundException if message not found
-     * @throws UnauthorizedMessageAccessException if user is not the receiver
-     */
-    @Transactional(readOnly = false)
-    public void markMessageAsRead(Long messageId, User currentUser) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
-
-        if (!message.getReceiver().equals(currentUser)) {
-            throw new UnauthorizedMessageAccessException("Unauthorized: You can only mark your own received messages as read");
-        }
-
-        message.markAsRead();
-        messageRepository.save(message);
-    }
-
-    /**
      * Mark a message as unread.
      * @param messageId The message to mark as unread
      * @param currentUser The user attempting to mark the message
@@ -103,6 +86,7 @@ public class MessageService {
      * @param receiver The user receiving the message
      * @param message The message content
      */
+    @Transactional(readOnly = false)
     public void sendMessage(User sender, User receiver, String message) {
         mediator.sendMessage(sender, receiver, message);
     }
@@ -135,5 +119,48 @@ public class MessageService {
         return messageRepository.findByReceiverIdAndReadAtIsNull(currentUser.getId())
                 .map(List::size)
                 .orElse(0);
+    }
+
+    /**
+     * Get the most recent received message from each unique sender.
+     * Used for displaying an inbox overview.
+     *
+     * @param currentUser The user to get the inbox for
+     * @return A list of unique messages from different senders
+     */
+    public List<Message> getRecentConversations(User currentUser) {
+        List<Message> inbox = getInbox(currentUser);
+        List<Message> previews = new ArrayList<>();
+        Set<Long> seenSenderIds = new HashSet<>();
+
+        for (Message message : inbox) {
+            Long senderId = message.getSender().getId();
+            if (seenSenderIds.add(senderId)) {
+                previews.add(message);
+            }
+        }
+
+        return previews;
+    }
+
+    /**
+     * Mark all unread messages in a conversation as read.
+     *
+     * @param currentUser The user receiving the messages
+     * @param otherUser The user who sent the messages
+     */
+    @Transactional(readOnly = false)
+    public void markConversationAsRead(User currentUser, User otherUser) {
+        List<Message> conversation = getConversation(currentUser, otherUser);
+        boolean changed = false;
+        for (Message msg : conversation) {
+            if (msg.getReceiver().getId().equals(currentUser.getId()) && !msg.isRead()) {
+                msg.markAsRead();
+                changed = true;
+            }
+        }
+        if (changed) {
+            messageRepository.saveAll(conversation);
+        }
     }
 }
