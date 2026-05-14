@@ -3,6 +3,7 @@ package se.mau.localzero.auth.service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import se.mau.localzero.CommunityRepository;
+import se.mau.localzero.exception.UserNotFoundException;
 import se.mau.localzero.domain.Community;
 import se.mau.localzero.domain.User;
 import se.mau.localzero.domain.UserRole;
@@ -35,7 +36,7 @@ public class AuthService {
      */
     public void registerNewUser(String username, String email, String userCommunity, String unhashedPass) {
         Community community = communityRepository.findFirstByName(userCommunity)
-                .orElseGet(() -> new Community(userCommunity));
+                .orElseGet(() -> communityRepository.save(new Community(userCommunity)));
 
         User newUser = new User(username, email, community, unhashedPass);
         RegistrationHandler validation = new ValidationHandler();
@@ -62,6 +63,6 @@ public class AuthService {
      */
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
     }
 }

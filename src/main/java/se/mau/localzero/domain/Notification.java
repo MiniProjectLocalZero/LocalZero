@@ -56,13 +56,7 @@ public class Notification {
     }
 
     public void setRecipient(User recipient) {
-        if (this.recipient != null) {
-            this.recipient.getNotifications().remove(this);
-        }
         this.recipient = recipient;
-        if (recipient != null) {
-            recipient.getNotifications().add(this);
-        }
     }
 
     public void markAsRead() {

@@ -34,3 +34,7 @@ user has been logged out successfully: hoho - Date: 2026-05-14 Time: 04:34:42
 User has been logged in successfully: ohoh - Date: 2026-05-14 Time: 04:34:45
 user has been logged out successfully: ohoh - Date: 2026-05-14 Time: 04:34:59
 User has been logged in successfully: hoho - Date: 2026-05-14 Time: 04:35:03
+User has been logged in successfully: Carl - Date: 2026-05-06 Time: 08:06:14
+user has been logged out successfully: Carl - Date: 2026-05-06 Time: 08:15:33
+User has been logged in successfully: Calle - Date: 2026-05-06 Time: 08:15:59
+User has been logged in successfully: Carl - Date: 2026-05-06 Time: 08:25:47
