@@ -114,7 +114,7 @@ public class InitiativeController {
                 .orElseThrow(() -> new RuntimeException("Initiative not found"));
 
         //only creator can delete
-        if(!initiative.getCreatedBy().getUsername().equals(userDetails.getUsername())) {
+        if (!initiative.getCreatedBy().getUsername().equals(userDetails.getUsername())) {
             return "redirect:/initiatives?error=You are not the owner of this initiative";
         }
         initiativeRepository.delete(initiative);
@@ -124,7 +124,7 @@ public class InitiativeController {
     @PostMapping("/{id}/like")
     @ResponseBody //returns JSON response
     public ResponseEntity<?> toggleLike(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
-        try{
+        try {
             Initiative initiative = initiativeRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Initiative not found"));
 
@@ -136,10 +136,27 @@ public class InitiativeController {
             if (initiative.getLikes().contains(user)) {
                 initiative.removeLike(user);
                 isLiked = false;
-            }else{
+            } else {
                 initiative.addLike(user);
                 isLiked = true;
+
+                if (!initiative.getCreatedBy().getId().equals(user.getId())) {
+                    String title = user.getUsername() + " liked your initiative";
+                    String message = user.getUsername() + " liked '" + initiative.getTitle() + "'";
+
+                    Notification notification = new Notification(
+                            title,
+                            message,
+                            initiative.getCreatedBy(),
+                            NotificationEntityType.INITIATIVE,
+                            initiative.getId()
+                    );
+
+                    notificationRepository.save(notification);
+                }
+
             }
+
             initiativeRepository.save(initiative);
 
             return ResponseEntity.ok(Map.of(
@@ -147,7 +164,7 @@ public class InitiativeController {
                     "newLikeCount", initiative.getLikes().size(),
                     "isLiked", isLiked
             ));
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "error", e.getMessage()));
         }
@@ -167,8 +184,7 @@ public class InitiativeController {
             if (initiative.getParticipants().contains(user)) {
                 initiative.removeParticipant(user);
                 isParticipating = false;
-            }
-            else {
+            } else {
                 initiative.addParticipant(user);
                 isParticipating = true;
 
