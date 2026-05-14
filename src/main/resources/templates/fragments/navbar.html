@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>LocalZero - Navbar</title>
     <link rel="stylesheet" th:href="@{/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/messaging.css}">
 
 </head>
 <body>
@@ -35,13 +36,14 @@
             </svg>
         </a>
 
-        <a th:href="@{/message}" class="icon-button">
+        <button type="button" id="messageButton" class="icon-button messaging-trigger" onclick="openMessagingModal()">
+            <span id="message-badge" class="notification-badge message-badge" style="display: none;">0</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                  class="lucide lucide-message-circle-icon lucide-message-circle">
                 <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/>
             </svg>
-        </a>
+        </button>
 
         <a th:href="@{/notification/inbox}" class="icon-button notification-container">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -57,7 +59,13 @@
             <button id="logout-btn" type="submit">Log out</button>
         </form>
     </div>
+
+    <div id="messagingModal" class="messaging-modal-overlay" aria-hidden="true">
+        <div id="messagingContent" class="messaging-modal-content"></div>
+    </div>
+
     <script th:src="@{/js/notification.js}" defer></script>
+    <script th:src="@{/js/messaging.js}" defer></script>
 
 </nav>
 

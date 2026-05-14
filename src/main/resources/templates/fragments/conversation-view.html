@@ -1,0 +1,36 @@
+<div th:fragment="content" class="conversation-container">
+    <div class="conversation-header">
+        <div class="conversation-header-info">
+            <button class="mobile-back-btn" onclick="closeConversationMobile()" aria-label="Back to conversations">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </button>
+            <div class="conversation-avatar conversation-avatar-large">
+                <span th:text="${#strings.substring(otherUser.username, 0, 1)}">U</span>
+            </div>
+            <div>
+                <h4 th:text="${otherUser.username}">Username</h4>
+                <p class="messaging-eyebrow">Private community chat</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="messages-container" id="messages-container">
+        <div th:each="msg : ${messages}"
+             class="message-bubble"
+             th:classappend="${msg.sender.id == currentUser.id} ? 'sent' : 'received'">
+            <div class="message-content" th:text="${msg.content}"></div>
+            <div class="message-meta">
+                <span th:text="${#temporals.format(msg.createdAt, 'HH:mm')}"></span>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(messages)}" class="empty-messages">
+            <div class="empty-messages-card">
+                <p class="empty-title">No messages in this conversation yet</p>
+                <p>Say hello and start the thread.</p>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/message-input :: content}"></div>
+</div>

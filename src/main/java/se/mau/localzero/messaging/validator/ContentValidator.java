@@ -56,7 +56,7 @@ public class ContentValidator extends Validator {
 
 
         switch (entityType) {
-            case MESSAGE, INITIATIVE, COMMUNITY -> {
+            case MESSAGE, INITIATIVE, COMMUNITY, POST, COMMENT, LIKE -> {
                 if (notification.getEntityId() == null) {
                     throw new NotificationValidationException(
                             "Notification entity ID cannot be null for " + entityType.name().toLowerCase() + " notifications"
