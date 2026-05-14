@@ -66,6 +66,15 @@ public class Initiative {
     )
     private Set<User> participants = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "initiative_likes",
+            joinColumns = @JoinColumn(name = "initiative_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+
+    private Set<User> likes = new HashSet<>();
+
     @OneToMany(mappedBy = "initiative", fetch = FetchType.LAZY)
     private Set<Post> posts = new HashSet<>();
 
@@ -131,6 +140,14 @@ public class Initiative {
         if (post != null && posts.remove(post)) {
             post.setInitiative(null);
         }
+    }
+
+    public void addLike(User user) {
+        this.likes.add(user);
+    }
+
+    public void removeLike(User user) {
+        this.likes.remove(user);
     }
 
     @PrePersist

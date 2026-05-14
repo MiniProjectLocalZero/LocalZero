@@ -7,13 +7,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import se.mau.localzero.domain.Initiative;
-import se.mau.localzero.domain.User;
-import se.mau.localzero.domain.Visibility;
+import se.mau.localzero.domain.*;
 import se.mau.localzero.initiative.dto.InitiativeDto;
 import se.mau.localzero.initiative.repository.InitiativeRepository;
 import se.mau.localzero.initiative.service.InitiativeService;
 import se.mau.localzero.auth.repository.UserRepository;
+import se.mau.localzero.messaging.mediator.NotificationMediator;
+import se.mau.localzero.messaging.repository.NotificationRepository;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -26,11 +26,15 @@ public class InitiativeController {
     private final InitiativeService initiativeService;
     private final UserRepository userRepository;
     private final InitiativeRepository initiativeRepository;
+    private final NotificationMediator notificationMediator;
+    private final NotificationRepository notificationRepository;
 
-    public InitiativeController(InitiativeService initiativeService, UserRepository userRepository, InitiativeRepository initiativeRepository) {
+    public InitiativeController(InitiativeService initiativeService, UserRepository userRepository, InitiativeRepository initiativeRepository, NotificationMediator notificationMediator, NotificationRepository notificationRepository) {
         this.initiativeService = initiativeService;
         this.userRepository = userRepository;
         this.initiativeRepository = initiativeRepository;
+        this.notificationMediator = notificationMediator;
+        this.notificationRepository = notificationRepository;
     }
 
     //shows the page for creating a new initiative
@@ -129,23 +133,74 @@ public class InitiativeController {
 
             boolean isLiked;
 
-            if (initiative.getParticipants().contains(user)) {
-                initiative.removeParticipant(user);
+            if (initiative.getLikes().contains(user)) {
+                initiative.removeLike(user);
                 isLiked = false;
             }else{
-                initiative.addParticipant(user);
+                initiative.addLike(user);
                 isLiked = true;
             }
             initiativeRepository.save(initiative);
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "newLikeCount", initiative.getParticipants().size(),
+                    "newLikeCount", initiative.getLikes().size(),
                     "isLiked", isLiked
             ));
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "error", e.getMessage()));
         }
+    }
+
+    @PostMapping("/{id}/join")
+    @ResponseBody
+    public ResponseEntity<?> toggleParticipation(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            Initiative initiative = initiativeRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Initiative not found"));
+            User user = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            boolean isParticipating;
+
+            if (initiative.getParticipants().contains(user)) {
+                initiative.removeParticipant(user);
+                isParticipating = false;
+            }
+            else {
+                initiative.addParticipant(user);
+                isParticipating = true;
+
+                if (!initiative.getCreatedBy().getId().equals(user.getId())) {
+                    String title = user.getUsername() + " joined your initiative";
+                    String message = user.getUsername() + " has joined '" + initiative.getTitle() + "'";
+
+                    Notification notification = new Notification(
+                            title,
+                            message,
+                            initiative.getCreatedBy(),
+                            NotificationEntityType.INITIATIVE,
+                            initiative.getId()
+                    );
+
+                    notificationRepository.save(notification);
+                }
+            }
+
+            initiativeRepository.save(initiative);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "newParticipantCount", initiative.getParticipants().size(),
+                    "isParticipating", isParticipating
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "error", e.getMessage()));
+
+        }
+
     }
 }
