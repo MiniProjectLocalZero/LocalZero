@@ -34,7 +34,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests((requests) -> requests
                     //Decide which pages everyone can see
-                .requestMatchers("/auth/login", "/auth/register", "/styles.css").permitAll()
+                .requestMatchers("/", "/auth/login", "/auth/register", "/styles.css", "/navbar.css", "/css/**", "/js/**").permitAll()
                     //Every other page requires the user to be logged in
                     .anyRequest().authenticated()
             )

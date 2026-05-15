@@ -12,12 +12,97 @@
 </head>
 <body>
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
-<div>
-    <h1>Welcome to Local Zero!</h1>
-    <h2>The solution your neighborhood community needs!</h2>
-    <div class="buttons">
-        <div class="actions">
-            <a th:href="@{/initiatives/create}" class="btn">Create a new initiative</a>
+
+<div class="homepage-container">
+    
+    <!-- AUTHENTICATED VIEW -->
+    <div sec:authorize="isAuthenticated()">
+        <section class="hero-section" style="padding: 40px 20px; margin-bottom: 30px;">
+            <h1>Welcome back, <span th:text="${username}">User</span>!</h1>
+            <h2 th:text="${communityName}">Your Community</h2>
+        </section>
+
+        <div class="quick-actions">
+            <a th:href="@{/initiatives/create}" class="btn-primary">Create Initiative</a>
+            <a th:href="@{/initiatives}" class="btn-secondary">Browse Initiatives</a>
+            <a th:href="@{/messages/inbox}" class="btn-secondary">View Messages</a>
+            <a th:href="@{/sustainability/log}" class="btn-secondary">Log Action</a>
+        </div>
+
+        <div class="dashboard-layout">
+            <main>
+                <div class="section-title">
+                    <span>Recent Initiatives</span>
+                    <a th:href="@{/initiatives}" style="font-size: 0.9rem; color: var(--dark-green-color);">See all</a>
+                </div>
+
+                <div class="initiative-preview-list">
+                    <div th:each="initiative : ${recentInitiatives}" class="mini-initiative-card">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <span class="category-tag" th:text="${initiative.category}">CATEGORY</span>
+                                <h4 th:text="${initiative.title}" style="margin-top: 10px;">Initiative Title</h4>
+                                <p th:text="${#strings.abbreviate(initiative.description, 100)}" style="font-size: 0.9rem; color: #555; margin: 10px 0;">Description...</p>
+                            </div>
+                            <div class="stats" style="flex-direction: column; align-items: flex-end; gap: 5px;">
+                                <div class="metric"><span th:text="${initiative.participants.size()}">0</span> participants</div>
+                                <div class="metric"><span th:text="${initiative.likes.size()}">0</span> likes</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${#lists.isEmpty(recentInitiatives)}" class="empty-state">
+                        <p>No initiatives in your community yet. Be the first to start one!</p>
+                    </div>
+                </div>
+            </main>
+
+            <aside>
+                <div class="impact-card">
+                    <h3>My Impact</h3>
+                    <div class="impact-stat">
+                        <span class="stat-value"><span th:text="${#numbers.formatDecimal(totalCarbonSaving, 1, 1)}">0.0</span> kg</span>
+                        <span class="stat-label">CO2 Saved</span>
+                    </div>
+                    <div class="impact-stat">
+                        <span class="stat-value" th:text="${totalActions}">0</span>
+                        <span class="stat-label">Sustainable Actions</span>
+                    </div>
+                    <a th:href="@{/sustainability/log}" class="btn-primary" style="display: block; text-align: center; margin-top: 10px; font-size: 0.9rem;">Log New Action</a>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- UNAUTHENTICATED VIEW -->
+    <div sec:authorize="!isAuthenticated()">
+        <section class="hero-section">
+            <h1>LocalZero</h1>
+            <h2>Collaborative Sustainability for Your Neighborhood</h2>
+            
+            <div class="about-text">
+                <p>LocalZero is a community engagement platform designed to help neighbors collaborate on sustainability initiatives. From tool sharing and carpooling to community gardening and food swaps, we provide the tools you need to make a real impact together.</p>
+            </div>
+
+            <div class="cta-buttons">
+                <a th:href="@{/auth/register}" class="btn-primary">Get Started</a>
+                <a th:href="@{/auth/login}" class="btn-secondary">Sign In</a>
+            </div>
+        </section>
+
+        <div class="dashboard-layout" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+            <div class="impact-card" style="text-align: center;">
+                <h3>Join Initiatives</h3>
+                <p style="font-size: 0.9rem; color: #666;">Find and participate in local sustainability projects started by your neighbors.</p>
+            </div>
+            <div class="impact-card" style="text-align: center;">
+                <h3>Track Your Impact</h3>
+                <p style="font-size: 0.9rem; color: #666;">Log your sustainable actions and see how much CO2 you're saving for the planet.</p>
+            </div>
+            <div class="impact-card" style="text-align: center;">
+                <h3>Connect Locally</h3>
+                <p style="font-size: 0.9rem; color: #666;">Communicate securely with community members to coordinate resources and ideas.</p>
+            </div>
         </div>
     </div>
 
