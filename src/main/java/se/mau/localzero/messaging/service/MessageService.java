@@ -122,20 +122,24 @@ public class MessageService {
     }
 
     /**
-     * Get the most recent received message from each unique sender.
+     * Get the most recent message from each unique conversation the user is part of.
+     * A conversation is defined by the pair of users involved (sender and receiver).
      * Used for displaying an inbox overview.
      *
-     * @param currentUser The user to get the inbox for
-     * @return A list of unique messages from different senders
+     * @param currentUser The user to get the conversations for
+     * @return A list of the most recent messages from different conversations
      */
     public List<Message> getRecentConversations(User currentUser) {
-        List<Message> inbox = getInbox(currentUser);
+        List<Message> allMessages = messageRepository.findAllByUserOrderByCreatedAtDesc(currentUser.getId()).orElse(List.of());
         List<Message> previews = new ArrayList<>();
-        Set<Long> seenSenderIds = new HashSet<>();
+        Set<Long> seenOtherUserIds = new HashSet<>();
 
-        for (Message message : inbox) {
-            Long senderId = message.getSender().getId();
-            if (seenSenderIds.add(senderId)) {
+        for (Message message : allMessages) {
+            Long otherUserId = message.getSender().getId().equals(currentUser.getId())
+                    ? message.getReceiver().getId()
+                    : message.getSender().getId();
+            
+            if (seenOtherUserIds.add(otherUserId)) {
                 previews.add(message);
             }
         }

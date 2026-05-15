@@ -19,17 +19,18 @@
              tabindex="0"
              class="conversation-item"
              th:each="convo : ${conversations}"
-             th:attr="data-user-id=${convo.sender.id}"
-             th:onclick="|loadConversation(${convo.sender.id})|"
-             th:onkeydown="|handleConversationKeydown(event, ${convo.sender.id})|"
-             th:classappend="${activeConversationUserId != null and convo.sender.id == activeConversationUserId} ? ' is-active' : ''">
+             th:with="otherUser=${convo.sender.id == currentUser.id ? convo.receiver : convo.sender}"
+             th:attr="data-user-id=${otherUser.id}"
+             th:onclick="|loadConversation(${otherUser.id})|"
+             th:onkeydown="|handleConversationKeydown(event, ${otherUser.id})|"
+             th:classappend="${activeConversationUserId != null and otherUser.id == activeConversationUserId} ? ' is-active' : ''">
             <div class="conversation-avatar">
-                <span th:text="${#strings.substring(convo.sender.username, 0, 1)}">U</span>
+                <span th:text="${#strings.substring(otherUser.username, 0, 1).toUpperCase()}">U</span>
             </div>
 
             <div class="conversation-details">
                 <div class="conversation-topline">
-                    <h4 th:text="${convo.sender.username}">Username</h4>
+                    <h4 th:text="${otherUser.username}">Username</h4>
                     <span class="conversation-time" th:text="${#temporals.format(convo.createdAt, 'HH:mm')}">12:30</span>
                 </div>
                 <p th:text="${convo.content}">Last message...</p>
@@ -37,12 +38,12 @@
 
             <div class="conversation-status-area">
                 <!-- If unread: show the dot -->
-                <span class="conversation-unread-dot" th:if="${convo.readAt == null}"></span>
+                <span class="conversation-unread-dot" th:if="${convo.readAt == null and convo.receiver.id == currentUser.id}"></span>
                 
                 <!-- If read: show the mark as unread button (hover state handled in CSS) -->
                 <button type="button" 
                         class="mark-unread-btn" 
-                        th:if="${convo.readAt != null}"
+                        th:if="${convo.readAt != null and convo.receiver.id == currentUser.id}"
                         th:onclick="|markAsUnread(event, ${convo.id})|"
                         title="Mark as unread">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
