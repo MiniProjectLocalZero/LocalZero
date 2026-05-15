@@ -150,6 +150,17 @@ function initAutoExpandTextarea() {
 
     textarea.addEventListener('input', adjustHeight);
     
+    // Handle Enter to send, Shift+Enter for new line
+    textarea.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            const form = this.closest('form');
+            if (form && this.value.trim().length > 0) {
+                sendMessage(new Event('submit'), form);
+            }
+        }
+    });
+
     // Initial adjustment in case there is content
     adjustHeight.call(textarea);
 }
