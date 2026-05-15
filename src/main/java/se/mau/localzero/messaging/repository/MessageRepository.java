@@ -52,4 +52,17 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             "AND m.deletedAt IS NULL " +
             "ORDER BY m.createdAt ASC")
     Optional<List<Message>> findConversationBetween(@Param("senderId") Long senderId, @Param("receiverId") Long receiverId);
+
+    /**
+     * Find all messages where the user is either the sender or the receiver, ordered by creation date (newest first).
+     * Excludes soft-deleted messages.
+     *
+     * @param userId The ID of the user
+     * @return Optional list of messages
+     */
+    @Query("SELECT m FROM Message m WHERE " +
+            "(m.sender.id = :userId OR m.receiver.id = :userId) " +
+            "AND m.deletedAt IS NULL " +
+            "ORDER BY m.createdAt DESC")
+    Optional<List<Message>> findAllByUserOrderByCreatedAtDesc(@Param("userId") Long userId);
 }

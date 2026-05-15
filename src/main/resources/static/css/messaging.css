@@ -501,6 +501,20 @@
     color: #546b41;
 }
 
+.input-hint {
+    font-size: 10px;
+    color: #9aa591;
+    margin-top: 4px;
+    padding-left: 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.message-composer:focus-within + .input-hint {
+    opacity: 1;
+}
+
 /* Responsive - Mobile sliding */
 @media (max-width: 768px) {
     .messaging-modal-overlay {
