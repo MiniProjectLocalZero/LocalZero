@@ -51,6 +51,7 @@ public class AuthController {
             return "redirect:/auth/login?success";
 
         } catch (Exception e) {
+            e.printStackTrace();
             String safeErrorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
             return "redirect:/auth/register?error=" + safeErrorMessage;
         }

@@ -17,7 +17,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = {"members", "initiatives"})
+@ToString(exclude = {"members", "initiatives", "posts"})
 @Table(name = "communities")
 public class Community {
 
@@ -37,6 +37,9 @@ public class Community {
 
     @OneToMany(mappedBy = "community", fetch = FetchType.LAZY)
     private Set<Initiative> initiatives = new HashSet<>();
+
+    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY)
+    private Set<Post> posts = new HashSet<>();
 
     public Community(String name) {
         this.name = name;
@@ -63,6 +66,18 @@ public class Community {
     public void removeInitiative(Initiative initiative) {
         if (initiative != null && initiatives.remove(initiative)) {
             initiative.setCommunity(null);
+        }
+    }
+
+    public void addPost(Post post) {
+        if (post != null && posts.add(post)) {
+            post.setCommunity(this);
+        }
+    }
+
+    public void removePost(Post post) {
+        if (post != null && posts.remove(post)) {
+            post.setCommunity(null);
         }
     }
 
