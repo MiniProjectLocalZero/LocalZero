@@ -1,0 +1,14 @@
+<div th:fragment="content" class="message-input-area">
+    <form id="sendMessageForm" class="message-composer" onsubmit="sendMessage(event, this)">
+        <input type="hidden" name="receiver.id" th:value="${otherUser.id}"/>
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+        <label class="sr-only" for="messageContent">Write a message</label>
+        <textarea id="messageContent" name="content" placeholder="Type a message" rows="1" required></textarea>
+        <button type="submit" class="send-message-btn" aria-label="Send">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+    </form>
+    <div class="input-hint">
+        <span><strong>Shift + Enter</strong> for a new line</span>
+    </div>
+</div>

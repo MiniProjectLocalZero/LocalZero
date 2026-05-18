@@ -97,23 +97,11 @@ public class Message {
     }
 
     public void setSender(User sender) {
-        if (this.sender != null) {
-            this.sender.getSentMessages().remove(this);
-        }
         this.sender = sender;
-        if (sender != null) {
-            sender.getSentMessages().add(this);
-        }
     }
 
     public void setReceiver(User receiver) {
-        if (this.receiver != null) {
-            this.receiver.getReceivedMessages().remove(this);
-        }
         this.receiver = receiver;
-        if (receiver != null) {
-            receiver.getReceivedMessages().add(this);
-        }
     }
 
     public void markAsRead() {

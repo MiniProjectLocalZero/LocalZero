@@ -37,15 +37,10 @@ public class SendMessageCommand implements MessageCommand {
     @Override
     @Transactional
     public boolean execute() {
-        try {
-            Message message = new Message(content, sender, receiver);
-            createdMessage = messageRepository.save(message);
-            logger.info("Message created from {} to {}", sender.getUsername(), receiver.getUsername());
-            return true;
-        } catch (Exception e) {
-            logger.error("Failed to create and send message from {} to {}", sender.getUsername(), receiver.getUsername(), e);
-            return false;
-        }
+        Message message = new Message(content, sender, receiver);
+        createdMessage = messageRepository.save(message);
+        logger.info("Message created from {} to {}", sender.getUsername(), receiver.getUsername());
+        return true;
     }
 
     @Override
