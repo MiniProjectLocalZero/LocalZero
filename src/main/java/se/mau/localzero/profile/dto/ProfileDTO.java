@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,4 +18,6 @@ public class ProfileDTO {
     private int postCount;
     private int initiativeCount;
     private int createdInitiativeCount;
+    private List<InitiativeSummaryDTO> createdInitiatives;
+    private List<InitiativeSummaryDTO> joinedInitiatives;
 }

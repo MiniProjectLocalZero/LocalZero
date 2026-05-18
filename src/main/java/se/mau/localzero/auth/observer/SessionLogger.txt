@@ -38,3 +38,6 @@ User has been logged in successfully: Carl - Date: 2026-05-06 Time: 08:06:14
 user has been logged out successfully: Carl - Date: 2026-05-06 Time: 08:15:33
 User has been logged in successfully: Calle - Date: 2026-05-06 Time: 08:15:59
 User has been logged in successfully: Carl - Date: 2026-05-06 Time: 08:25:47
+User has been logged in successfully: pastil - Date: 2026-05-18 Time: 07:05:18
+User has been logged in successfully: pastil - Date: 2026-05-18 Time: 07:30:02
+User has been logged in successfully: pastil - Date: 2026-05-18 Time: 07:34:02

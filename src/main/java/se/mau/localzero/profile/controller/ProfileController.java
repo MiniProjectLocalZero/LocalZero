@@ -1,29 +1,33 @@
 package se.mau.localzero.profile.controller;
 
-import ch.qos.logback.core.model.Model;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import se.mau.localzero.domain.Initiative;
-import se.mau.localzero.domain.User;
-
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import se.mau.localzero.auth.model.LocalZeroUserDetails;
+import se.mau.localzero.profile.dto.ProfileDTO;
+import se.mau.localzero.profile.mediator.ProfileMediator;
 
 @Controller
 @RequestMapping("/profile")
 public class ProfileController {
-    private User user;
-    private Initiative initiative;
 
-    public ProfileController(User user, Initiative initiative) {
-        this.user = user;
-        this.initiative = initiative;
+    private final ProfileMediator profileMediator;
+
+    public ProfileController(ProfileMediator profileMediator) {
+        this.profileMediator = profileMediator;
     }
 
-    @GetMapping("/profile")
-    public String profile() {
+    @GetMapping
+    public String profile(@AuthenticationPrincipal LocalZeroUserDetails userDetails, Model model) {
+        if (userDetails == null) {
+            return "redirect:/auth/login";
+        }
 
-
-        return "/profile";
+        ProfileDTO profileDTO = profileMediator.getUserProfile(userDetails.getUserId());
+        model.addAttribute("profile", profileDTO);
+        
+        return "profile";
     }
-
 }
