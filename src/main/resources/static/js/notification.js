@@ -1,6 +1,6 @@
-
 window.addEventListener('load', function () {
     console.log('Script loaded')
+
     fetch("/notifications/unread-count")
         .then(response => response.json())
         .then(count => {
@@ -22,7 +22,6 @@ window.addEventListener('load', function () {
             dropdown.classList.toggle("hidden");
         });
 
-        // Close menu is clicking anywhere else on page
         document.addEventListener("click", (event) => {
             const container = bellIcon.closest(".notification-container");
 
@@ -31,4 +30,39 @@ window.addEventListener('load', function () {
             }
         });
     }
-})
+
+    const markReadBtn = document.getElementById("mark-all-read");
+    if (markReadBtn) {
+        markReadBtn.addEventListener("click", function(event) {
+            event.preventDefault();
+
+            fetch("/notifications/mark-all-read", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log("Alla notiser markerade som lästa i databasen!");
+
+                        // 1. Dölj den röda pricken direkt
+                        const badge = document.getElementById('unread-badge');
+                        if (badge) {
+                            badge.style.display = 'none';
+                            badge.textContent = '0';
+                        }
+
+                        const unreadItems = document.querySelectorAll('.notification-item.unread');
+                        unreadItems.forEach(item => {
+                            item.classList.remove('unread');
+                        });
+
+                    } else {
+                        console.error("Kunde inte markera som lästa. Status:", response.status);
+                    }
+                })
+                .catch(error => console.error("Något gick fel med markeringen:", error));
+        });
+    }
+});
