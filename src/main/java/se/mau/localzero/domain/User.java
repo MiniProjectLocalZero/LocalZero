@@ -52,11 +52,11 @@ public class User {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id", nullable = false)
     private Community community;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role", nullable = false)
@@ -114,6 +114,10 @@ public class User {
     public void leaveInitiative(Initiative initiative) {
         participatingInitiatives.remove(initiative);
         initiative.getParticipants().remove(this);
+    }
+
+    public void addNotification(Notification notification) {
+        notifications.add(notification);
     }
 
     @PrePersist

@@ -1,0 +1,68 @@
+package se.mau.localzero.auth.service;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import se.mau.localzero.CommunityRepository;
+import se.mau.localzero.exception.UserNotFoundException;
+import se.mau.localzero.domain.Community;
+import se.mau.localzero.domain.User;
+import se.mau.localzero.domain.UserRole;
+import se.mau.localzero.auth.handler.RegistrationHandler;
+import se.mau.localzero.auth.handler.UserExistHandler;
+import se.mau.localzero.auth.handler.ValidationHandler;
+import se.mau.localzero.auth.repository.UserRepository;
+
+/**
+ * Service for handling authentication business logic
+ * Builds the Chain of Responsibilties for new users,
+ */
+@Service
+public class AuthService {
+    public final UserRepository userRepository;
+    public final PasswordEncoder passwordEncoder;
+    public final CommunityRepository communityRepository;
+
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, CommunityRepository communityRepository) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.communityRepository = communityRepository;
+    }
+
+    /**
+     * Tries to register a new user by running the validation chain.
+     * @param username User chosen Username
+     * @param userCommunity User chosen Community
+     * @param unhashedPass Plaintext password
+     */
+    public void registerNewUser(String username, String email, String userCommunity, String unhashedPass) {
+        Community community = communityRepository.findFirstByName(userCommunity)
+                .orElseGet(() -> communityRepository.save(new Community(userCommunity)));
+
+        User newUser = new User(username, email, community, unhashedPass);
+        RegistrationHandler validation = new ValidationHandler();
+        RegistrationHandler checkExist = new UserExistHandler(userRepository);
+
+        /**
+         * Here we tell validation that the next part of the chain is checkExist
+         */
+        validation.setNext(checkExist);
+
+        if (validation.check(newUser)) {
+            newUser.setPassword(passwordEncoder.encode(unhashedPass));
+            newUser.getRoles().add(UserRole.RESIDENT);
+            userRepository.save(newUser);
+        }
+    }
+
+    /**
+     * Get a user by ID.
+     *
+     * @param userId The user ID
+     * @return The User entity
+     * @throws RuntimeException if user not found
+     */
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    }
+}

@@ -1,0 +1,89 @@
+/* NAVBAR */
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.nav-wrapper {
+    background-color: var(--light-green-color);
+    color: var(--light-sand-color);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    position: relative;
+    top: 0;
+    z-index: 1000;
+}
+
+.logged-in-as {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#logged-in-span {
+    font-size: 1.1em;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+
+}
+
+.icon-button {
+    right: auto;
+    cursor:pointer;
+    color: var(--dark-green-color);
+}
+
+.icon-button:hover {
+    color: var(--light-sand-color);
+}
+
+.icon svg{
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+
+#logout-btn {
+    color: var(--light-sand-color);
+    background-color: var(--dark-green-color);
+    border: var(--light-sand-color);
+    cursor: pointer;
+    font-size: 18px;
+}
+
+#logout-btn:hover {
+    background-color: var(--light-sand-color);
+    color: var(--dark-green-color);
+}
+
+.notification-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background-color: #ef4444;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    min-width: 8px;
+    height: 10px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid white;
+}

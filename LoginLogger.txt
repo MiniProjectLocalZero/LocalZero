@@ -1,0 +1,2 @@
+User has been logged in successfully: malmo
+user has been logged out successfully: malmo - Date: 2026-05-02 Time: 10:53:48user has been logged out successfully: malmo - Date: 2026-05-02 Time: 10:54:06user has been logged out successfully: malmo - Date: 2026-05-02 Time: 10:54:17User has been logged in successfully: malmo - Date: 2026-05-02 Time: 10:59:36
