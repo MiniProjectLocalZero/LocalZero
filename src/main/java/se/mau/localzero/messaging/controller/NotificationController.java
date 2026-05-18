@@ -1,5 +1,6 @@
 package se.mau.localzero.messaging.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -104,5 +105,19 @@ public class NotificationController {
         User currentUser = userDetails.getUser();
         notificationService.deleteNotification(notificationId, currentUser);
         return "redirect:/notifications/inbox?success";
+    }
+
+    @PostMapping("/mark-all-read")
+    @ResponseBody
+    public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal LocalZeroUserDetails userDetails) {
+        if (userDetails != null) {
+            // Använder er befintliga smarta metod för att hämta användaren direkt!
+            User currentUser = userDetails.getUser();
+
+            // Anropa servicen
+            notificationService.markAllAsRead(currentUser);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
     }
 }
