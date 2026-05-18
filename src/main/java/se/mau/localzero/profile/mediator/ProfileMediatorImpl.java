@@ -31,10 +31,14 @@ public class ProfileMediatorImpl implements ProfileMediator {
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
 
         List<InitiativeSummaryDTO> created = user.getCreatedInitiatives().stream()
+
+                .sorted((a, b) -> b.getId().compareTo(a.getId()))
                 .map(this::convertToSummaryDTO)
                 .collect(Collectors.toList());
 
         List<InitiativeSummaryDTO> joined = user.getParticipatingInitiatives().stream()
+
+                .sorted((a, b) -> b.getId().compareTo(a.getId()))
                 .map(this::convertToSummaryDTO)
                 .collect(Collectors.toList());
 

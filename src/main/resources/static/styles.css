@@ -179,7 +179,8 @@ p {
 }
 
 .input-group input,
-.input-group select {
+.input-group select,
+.input-group textarea {
     width: 100%;
     padding: 12px;
     border: 1px solid #ccc;
@@ -189,6 +190,22 @@ p {
     box-sizing: border-box;
     outline: none;
 }
+
+.input-group textarea {
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
 
 .input-group select {
     appearance: none;

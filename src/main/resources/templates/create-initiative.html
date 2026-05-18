@@ -11,57 +11,61 @@
 </head>
 <body>
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
-<div class="container">
-    <h1>Start a new Initiative</h1>
-    <p>Fill in the details below to create a new initiative for your community.</p>
+<div class="initiatives-feed">
+    <div class="initiative-card">
+        <h1>Start a new Initiative</h1>
+        <h5>Fill in the details below to create a new initiative for your community.</h5>
 
-    <div th:if="${param.error}" class="error">
-        <p th:text="${param.error}">An error occurred while creating the initiative.</p>
-    </div>
-
-    <form th:action="@{/initiatives/create}" th:object="${initiativeDto}" method="post">
-        <div class="form-group">
-            <label for="title">Title:</label>
-            <input type="text" id="title" th:field="*{title}" placeholder="Enter initiative title" required>
+        <div th:if="${param.error}" class="error">
+            <p th:text="${param.error}">An error occurred while creating the initiative.</p>
         </div>
 
-        <div class="form-group">
-            <label for="description">Description:</label>
-            <textarea id="description" th:field="*{description}" placeholder="Describe your initiative"
-                      required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="category">Initiative Category:</label>
-            <select id="category" th:field="*{category}">
-                <option th:each="cat : ${T(se.mau.localzero.domain.Category).values()}"
-                        th:value="${cat}" th:text="${cat}"></option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="visibility">Visibility</label>
-            <select id="visibility" th:field="*{visibility}" required>
-                <option th:each="vis : ${T(se.mau.localzero.domain.Visibility).values()}"
-                        th:value="${vis}" th:text="${vis}"></option>
-            </select>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label for="startDate">Start Date:</label>
-                <input type="date" id="startDate" th:field="*{startDate}" required>
+        <form th:action="@{/initiatives/create}" th:object="${initiativeDto}" method="post">
+            <div class="input-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" th:field="*{title}" placeholder="Enter initiative title" required>
             </div>
-            <div class="form-group">
-                <label for="endDate">End Date:</label>
-                <input type="date" id="endDate" th:field="*{endDate}" required>
+
+            <div class="input-group">
+                <label for="description">Description</label>
+                <textarea id="description" th:field="*{description}" placeholder="Describe your initiative"
+                          required></textarea>
             </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="category">Initiative Category</label>
+                    <select id="category" th:field="*{category}">
+                        <option th:each="cat : ${T(se.mau.localzero.domain.Category).values()}"
+                                th:value="${cat}" th:text="${cat}"></option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="visibility">Visibility</label>
+                    <select id="visibility" th:field="*{visibility}" required>
+                        <option th:each="vis : ${T(se.mau.localzero.domain.Visibility).values()}"
+                                th:value="${vis}" th:text="${vis}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" th:field="*{startDate}" required>
+                </div>
+                <div class="input-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" th:field="*{endDate}" required>
+                </div>
+            </div>
+
+            <button type="submit" class="login-btn">Create Initiative</button>
+        </form>
+        <div style="margin-top: 20px; text-align: center;">
+            <a th:href="@{/initiatives}" style="color: #666; text-decoration: none; font-size: 14px;">Back to Initiatives</a>
         </div>
-
-        <button type="submit" class="btn">Create Initiative</button>
-    </form>
-    <div class="footer">
-        <a th:href="@{/initiatives}">Back to Initiatives</a>
     </div>
-
 </div>
 </body>

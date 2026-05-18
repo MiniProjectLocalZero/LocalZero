@@ -19,8 +19,8 @@ import java.util.Set;
 @Repository
 public interface InitiativeRepository extends JpaRepository<Initiative, Long> {
 
-    //gets public initiative or initiatives from the same community
-    @Query("SELECT i FROM Initiative i WHERE i.visibility = 'PUBLIC' OR i.community.id = :communityId")
+    // Ändra i InitiativeRepository.java:
+    @Query("SELECT i FROM Initiative i WHERE i.visibility = 'PUBLIC' OR i.community.id = :communityId ORDER BY i.createdAt DESC")
     List<Initiative> findVisibleInitiatives(Long communityId);
 
     List<Initiative> findByCommunityId(Long communityId);
