@@ -1,11 +1,14 @@
 package se.mau.localzero.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.ui.Model;
+import se.mau.localzero.auth.model.LocalZeroUserDetails;
+import se.mau.localzero.domain.Notification;
+import se.mau.localzero.domain.User;
+import se.mau.localzero.messaging.service.NotificationService;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class is for loading for ALL pages, made for navbar as this is used on all pages
@@ -14,19 +17,31 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalControllerAdvice {
 
-    // This method will be called each time new page is loaded
-    @ModelAttribute
-    public void addGlobalAttributes(Model model) {
-        // Mockdata for now but will replace when we have real notifications :)
+    private final NotificationService notificationService;
 
-        model.addAttribute("unreadCount", 2); // How many unread notifs
+    public GlobalControllerAdvice(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
-        // Mockdata for testing
-        List<Map<String, Object>> mockNotifications = List.of(
-                Map.of("message", "Nini left a comment on your post", "timeAgo", "5 min ago", "isRead", false),
-                Map.of("message", "You have earned 5 points this week", "timeAgo", "1 day ago", "isRead", true)
-        );
+    @ModelAttribute("recentNotifications")
+    public List<Notification> addRecentNotifications(@AuthenticationPrincipal LocalZeroUserDetails userDetails) {
+        if (userDetails != null) {
+            User user = userDetails.getUser();
+            List<Notification> allNotifs = notificationService.getNotificationInbox(user);
 
-        model.addAttribute("recentNotifications", mockNotifications);
+            if (allNotifs.size() > 5) {
+                return allNotifs.subList(0, 5);
+            }
+            return allNotifs;
+        }
+        return List.of();
+    }
+
+    @ModelAttribute("unreadCount")
+    public long addUnreadCount(@AuthenticationPrincipal LocalZeroUserDetails userDetails) {
+        if (userDetails != null) {
+            return notificationService.getUnreadNotificationCount(userDetails.getUser());
+        }
+        return 0;
     }
 }

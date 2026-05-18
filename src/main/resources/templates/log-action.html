@@ -4,6 +4,9 @@
     <title>LocalZero - Log eco-action</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
     <link rel="stylesheet" th:href="@{/navbar.css}">
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 

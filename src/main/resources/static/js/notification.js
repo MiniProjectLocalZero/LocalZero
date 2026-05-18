@@ -36,17 +36,31 @@ window.addEventListener('load', function () {
         markReadBtn.addEventListener("click", function(event) {
             event.preventDefault();
 
+            // 1. Skapa standard-headers
+            const fetchHeaders = {
+                "Content-Type": "application/json"
+            };
+
+            // 2. Leta efter CSRF-taggarna försiktigt (utan att krascha om de saknas)
+            const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+            const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+
+            // 3. Om de finns, lägg till dem i våra headers
+            if (csrfTokenMeta && csrfHeaderMeta) {
+                const csrfToken = csrfTokenMeta.getAttribute('content');
+                const csrfHeader = csrfHeaderMeta.getAttribute('content');
+                fetchHeaders[csrfHeader] = csrfToken;
+            }
+
+            // 4. Skicka anropet
             fetch("/notifications/mark-all-read", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                headers: fetchHeaders
             })
                 .then(response => {
                     if (response.ok) {
                         console.log("Alla notiser markerade som lästa i databasen!");
 
-                        // 1. Dölj den röda pricken direkt
                         const badge = document.getElementById('unread-badge');
                         if (badge) {
                             badge.style.display = 'none';
@@ -57,7 +71,6 @@ window.addEventListener('load', function () {
                         unreadItems.forEach(item => {
                             item.classList.remove('unread');
                         });
-
                     } else {
                         console.error("Kunde inte markera som lästa. Status:", response.status);
                     }
