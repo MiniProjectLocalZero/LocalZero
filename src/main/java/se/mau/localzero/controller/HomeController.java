@@ -13,6 +13,7 @@ import se.mau.localzero.domain.User;
 import se.mau.localzero.initiative.repository.InitiativeRepository;
 import se.mau.localzero.sustainability.repository.SustainabilityActionRepository;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
