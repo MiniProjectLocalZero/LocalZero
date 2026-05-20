@@ -12,6 +12,8 @@ import se.mau.localzero.auth.handler.UserExistHandler;
 import se.mau.localzero.auth.handler.ValidationHandler;
 import se.mau.localzero.auth.repository.UserRepository;
 
+import java.util.Set;
+
 /**
  * Service for handling authentication business logic
  * Builds the Chain of Responsibilties for new users,
@@ -34,7 +36,7 @@ public class AuthService {
      * @param userCommunity User chosen Community
      * @param unhashedPass Plaintext password
      */
-    public void registerNewUser(String username, String email, String userCommunity, String unhashedPass) {
+    public void registerNewUser(String username, String email, String userCommunity, String unhashedPass, Set<UserRole> roles) {
         Community community = communityRepository.findFirstByName(userCommunity)
                 .orElseGet(() -> communityRepository.save(new Community(userCommunity)));
 
@@ -49,7 +51,13 @@ public class AuthService {
 
         if (validation.check(newUser)) {
             newUser.setPassword(passwordEncoder.encode(unhashedPass));
-            newUser.getRoles().add(UserRole.RESIDENT);
+            
+            if (roles == null || roles.isEmpty()) {
+                newUser.getRoles().add(UserRole.RESIDENT);
+            } else {
+                newUser.getRoles().addAll(roles);
+            }
+            
             userRepository.save(newUser);
         }
     }
@@ -64,5 +72,13 @@ public class AuthService {
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    }
+
+    /**
+     * Get all users with the REPRESENTATIVE role.
+     * @return A list of all representatives
+     */
+    public java.util.List<User> getAllRepresentatives() {
+        return userRepository.findByRolesContaining(UserRole.REPRESENTATIVE);
     }
 }

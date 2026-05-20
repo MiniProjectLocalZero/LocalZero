@@ -1,109 +1,231 @@
-/* NAVBAR */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 
-body {
-    margin: 0;
-    padding: 0;
+:root {
+    --nav-bg: #99AD7A;
+    --nav-text: #FFF8EC;
+    --nav-accent: #546B41;
+    --nav-height: 70px;
 }
 
-.nav-wrapper {
-    background-color: var(--light-green-color);
-    color: var(--light-sand-color);
-    padding: 15px 20px;
+.nav-container {
+    background-color: var(--nav-bg);
+    color: var(--nav-text);
+    height: var(--nav-height);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0 5%;
     position: sticky;
-    position: relative;
     top: 0;
-    z-index: 1000;
+    z-index: 2000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+    width: 100%;
 }
 
-.logged-in-as {
+/* Brand Section */
+.nav-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+    z-index: 2002;
 }
 
-#logged-in-span {
-    font-size: 1.1em;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+.brand-logo {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--nav-text);
+    text-decoration: none;
+    letter-spacing: -1px;
+    transition: transform 0.2s;
     white-space: nowrap;
-
 }
 
-.icon-button {
-    right: auto;
-    cursor:pointer;
-    color: var(--dark-green-color);
+.brand-logo:hover {
+    transform: scale(1.05);
 }
 
-.icon-button:hover {
-    color: var(--light-sand-color);
+/* Navigation Content */
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    margin-left: 50px;
 }
 
-.icon svg{
+/* Nav Links */
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-link {
+    color: var(--nav-text);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.85;
+    transition: opacity 0.2s, transform 0.2s;
+    white-space: nowrap;
+}
+
+.nav-link:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+.nav-link i {
+    font-size: 1.1rem;
+}
+
+/* Actions Section */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+}
+
+.user-greeting {
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.9;
+    color: var(--nav-text);
+    white-space: nowrap;
+}
+
+.action-icons {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--nav-text);
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 6px;
+    transition: color 0.2s, transform 0.2s;
+    text-decoration: none;
+}
+
+.icon-btn:hover {
+    color: var(--nav-accent);
+    transform: scale(1.15);
+}
+
+.icon-btn i {
+    font-size: 1.4rem;
     width: 24px;
     height: 24px;
-    display: block;
-}
-
-
-#logout-btn {
-    color: var(--light-sand-color);
-    background-color: var(--dark-green-color);
-    border: var(--light-sand-color);
-    cursor: pointer;
-    font-size: 18px;
-}
-
-#logout-btn:hover {
-    background-color: var(--light-sand-color);
-    color: var(--dark-green-color);
-}
-
-/* --- NOTIFIKATIONER --- */
-
-.notification-container {
-    position: relative;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.notification-badge {
+/* Badges */
+.badge {
     position: absolute;
-    top: -5px;
-    right: -8px;
+    top: 0;
+    right: 0;
     background-color: #ef4444;
     color: white;
-    font-size: 0.75rem;
-    font-weight: bold;
-    min-width: 8px;
-    height: 10px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    min-width: 18px;
+    height: 18px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 4px;
-    /* Uppdaterad till er ljusgröna för att smälta in snyggt i navbaren */
-    border: 2px solid var(--light-green-color);
+    border: 2px solid var(--nav-bg);
 }
 
-/* Dropdown-boxen */
+/* Logout Button */
+.logout-btn {
+    background-color: var(--nav-accent);
+    color: var(--nav-text);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.logout-btn:hover {
+    background-color: #455a36;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+/* Mobile Toggle */
+.mobile-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 2002;
+    margin-right: -10px;
+}
+
+.mobile-toggle .bar {
+    width: 28px;
+    height: 3px;
+    background-color: var(--nav-text);
+    border-radius: 4px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hamburger Animation */
+.mobile-toggle.active .bar:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+.mobile-toggle.active .bar:nth-child(2) {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+.mobile-toggle.active .bar:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+/* Notifications Dropdown (Refined) */
+.notification-wrapper {
+    position: relative;
+}
+
 .notification-dropdown {
     position: absolute;
-    top: 40px;
-    right: 0;
-    width: 280px;
-    background-color: var(--light-sand-color);
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
+    top: 55px;
+    right: -10px;
+    width: 320px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    z-index: 2005;
     overflow: hidden;
-    color: var(--dark-green-color);
-    border: 1px solid var(--dark-sand-color);
+    color: #333;
+    border: 1px solid #eee;
+    animation: fadeInDown 0.3s ease-out;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .notification-dropdown.hidden {
@@ -111,9 +233,9 @@ body {
 }
 
 .dropdown-header {
-    background-color: var(--dark-sand-color);
-    padding: 12px 15px;
-    border-bottom: 1px solid var(--dark-green-color);
+    background: #fdfdfd;
+    padding: 18px;
+    border-bottom: 1px solid #f0f0f0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -121,53 +243,162 @@ body {
 
 .dropdown-header h4 {
     margin: 0;
-    font-size: 14px;
-    font-weight: bold;
-    color: var(--dark-green-color);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--nav-accent);
 }
 
 .dropdown-header a {
-    font-size: 12px;
-    color: var(--dark-green-color);
+    font-size: 0.8rem;
+    color: #888;
     text-decoration: none;
-    font-weight: bold;
+    transition: color 0.2s;
 }
 
 .dropdown-header a:hover {
-    text-decoration: underline;
+    color: var(--nav-bg);
 }
 
 .notification-item {
-    padding: 12px 15px;
-    border-bottom: 1px solid var(--dark-sand-color);
-    font-size: 13px;
-    cursor: pointer;
-    background-color: var(--light-sand-color);
-    color: var(--dark-green-color);
-    transition: filter 0.2s;
+    padding: 18px;
+    border-bottom: 1px solid #f8f8f8;
+    transition: background 0.2s;
 }
 
 .notification-item:hover {
-    filter: brightness(1.05);
+    background: #fafafa;
 }
 
-/* Olästa notifikationer */
 .notification-item.unread {
-    background-color: var(--light-green-color);
-    color: white;
-}
-
-.notification-item.unread .time {
-    color: var(--light-sand-color);
+    background: #f4f9f4;
+    border-left: 4px solid var(--nav-bg);
 }
 
 .notification-item p {
-    margin: 0 0 5px 0;
-    line-height: 1.4;
+    margin: 0 0 6px 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #444;
 }
 
 .notification-item .time {
-    font-size: 11px;
-    color: var(--dark-green-color);
-    opacity: 0.8;
+    font-size: 0.75rem;
+    color: #aaa;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .nav-container {
+        padding: 0 20px;
+        position: relative; /* Change from sticky to relative on mobile for better control */
+    }
+
+    .nav-brand {
+        flex: 1;
+        justify-content: space-between;
+        z-index: 2005; /* Keep brand and toggle on top */
+    }
+
+    .mobile-toggle {
+        display: flex;
+    }
+
+    .nav-content {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100vh;
+        background-color: var(--nav-bg);
+        flex-direction: column;
+        justify-content: flex-start; /* Start from top */
+        align-items: center;
+        margin-left: 0;
+        padding: 100px 0 40px; /* More padding top for the brand logo space */
+        transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        gap: 40px;
+        z-index: 2001;
+        overflow-y: auto; 
+    }
+
+    .nav-content.active {
+        left: 0;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+        width: 100%;
+    }
+
+    .nav-link {
+        font-size: 1.3rem;
+        font-weight: 700;
+        width: 100%;
+        justify-content: center;
+        padding: 10px 0;
+    }
+
+    .nav-actions {
+        flex-direction: column;
+        gap: 25px;
+        width: 100%;
+        margin-top: 20px;
+        padding: 0 20px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 40px;
+    }
+    
+    .user-greeting {
+        font-size: 1.1rem;
+        text-align: center;
+        margin-bottom: 10px;
+        opacity: 1;
+    }
+
+    .action-icons {
+        gap: 25px;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .icon-btn i {
+        font-size: 1.8rem;
+        width: 45px;
+        height: 45px;
+    }
+    
+    .logout-btn {
+        padding: 14px 0;
+        width: 100%;
+        max-width: 250px;
+        font-size: 1rem;
+        border-radius: 30px;
+        margin-top: 10px;
+    }
+
+    .badge {
+        min-width: 20px;
+        height: 20px;
+        font-size: 0.75rem;
+        top: -2px;
+        right: -2px;
+    }
+}
+
+@media (max-width: 480px) {
+    .brand-logo {
+        font-size: 1.4rem;
+    }
+    
+    .nav-content {
+        gap: 30px;
+        padding-top: 90px;
+    }
+
+    .nav-actions {
+        padding-top: 30px;
+    }
 }

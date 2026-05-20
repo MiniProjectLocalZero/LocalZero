@@ -63,6 +63,9 @@ public class Message {
     @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isBroadcast = false;
+
     public Message(String content, User sender, User receiver) {
         this.content = content;
         setSender(sender);

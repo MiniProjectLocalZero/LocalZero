@@ -345,7 +345,7 @@ function fetchCommunityUsers() {
             if (!list) return;
 
             if (users.length === 0) {
-                list.innerHTML = '<div class="user-picker-empty"><p>No other members in your community</p></div>';
+                list.innerHTML = '<div class="user-picker-empty"><p>No other members available</p></div>';
                 return;
             }
 
@@ -355,7 +355,10 @@ function fetchCommunityUsers() {
                         <span>${(user.username || '?').substring(0, 1).toUpperCase()}</span>
                     </div>
                     <div>
-                        <div class="user-picker-item-name">${user.username || 'Unknown'}</div>
+                        <div class="user-picker-item-name">
+                            ${user.username || 'Unknown'} 
+                            ${user.representative ? '<span class="rep-badge-inline">(Representative)</span>' : ''}
+                        </div>
                         <div class="user-picker-item-community">${user.communityName || 'Community'}</div>
                     </div>
                 </button>
@@ -369,6 +372,57 @@ function fetchCommunityUsers() {
             }
         });
 }
+
+function openBroadcastModal() {
+    const modal = document.getElementById('broadcastModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        const textarea = document.getElementById('broadcastContent');
+        if (textarea) {
+            textarea.value = '';
+            textarea.focus();
+        }
+    }
+}
+
+function closeBroadcastModal() {
+    const modal = document.getElementById('broadcastModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function sendBroadcast(event) {
+    if (event) event.preventDefault();
+    
+    const content = document.getElementById('broadcastContent').value;
+    if (!content.trim()) return;
+
+    const params = new URLSearchParams();
+    params.append('content', content);
+
+    fetchWithCsrf('/messages/broadcast', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString()
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to send broadcast');
+        return response.json();
+    })
+    .then(data => {
+        closeBroadcastModal();
+        alert('Broadcast sent successfully to all community members!');
+        refreshConversationList();
+    })
+    .catch(err => {
+        console.error('Error sending broadcast: ', err);
+        alert('Could not send broadcast. Please try again.');
+    });
+}
+
 
 function filterUsers(query) {
     const items = document.querySelectorAll('.user-picker-item');

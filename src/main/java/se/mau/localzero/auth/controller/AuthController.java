@@ -45,7 +45,8 @@ public class AuthController {
                     dto.getUsername(),
                     dto.getEmail(),
                     dto.getCommunity(),
-                    dto.getPassword()
+                    dto.getPassword(),
+                    dto.getRoles()
             );
 
             return "redirect:/auth/login?success";
