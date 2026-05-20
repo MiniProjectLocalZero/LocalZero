@@ -32,6 +32,10 @@ public class InitiativeService {
 
     public Initiative saveNewInitiative(InitiativeDto dto, User creator, Community community) {
         Initiative initiative = initiativeFactoryRegistry.create(dto, creator, community);
+        
+        // Auto-join creator
+        initiative.addParticipant(creator);
+        
         Initiative savedInitiative = initiativeRepository.save(initiative);
         List<User> recipients = userRepository.findByCommunity(community).orElse(List.of())
                 .stream()

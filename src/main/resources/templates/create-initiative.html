@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Start a new Initiative - LocalZero</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/styles.css}">
     <link rel="stylesheet" th:href="@{/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/messaging.css}">
@@ -41,7 +42,7 @@
                 <label for="category">Category</label>
                 <select id="category" th:field="*{category}">
                     <option th:each="cat : ${T(se.mau.localzero.domain.Category).values()}"
-                            th:value="${cat}" th:text="${cat}"></option>
+                            th:value="${cat}" th:text="${cat.displayName}"></option>
                 </select>
             </div>
 
@@ -49,7 +50,7 @@
                 <label for="visibility">Visibility</label>
                 <select id="visibility" th:field="*{visibility}" required>
                     <option th:each="vis : ${T(se.mau.localzero.domain.Visibility).values()}"
-                            th:value="${vis}" th:text="${vis}"></option>
+                            th:value="${vis}" th:text="${vis.displayName}"></option>
                 </select>
             </div>
         </div>

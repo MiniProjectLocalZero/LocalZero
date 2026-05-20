@@ -37,15 +37,7 @@
     </div>
 
     <div th:each="init : ${initiatives}" class="initiative-card">
-        <!-- TEST -->
-        <div>
-            <form th:action="@{/initiatives/{id}/join(id=${init.id})}" method="post" style="margin-top: 10px;">
-                <button type="submit" style="background-color: lightgreen; padding: 5px;">JOIN INITIATIVE TEST
-                    NOTIFICATION
-                </button>
-            </form>
-        </div>
-
+        <span class="category-tag" th:text="${init.category.displayName}">Category</span>
         <div class="card-header">
             <div class="header-text">
                 <h4 th:text="${init.community.name}">Malmö Community</h4>
@@ -74,24 +66,28 @@
             <span class="like-count" th:text="${init.likes.size()}">0</span> likes
        </span>
 
-                <button class="btn-join-action">
-                    <i class="fas fa-plus"></i> Join initiative
+                <button th:class="${init.participants.contains(#authentication.principal.user) ? 'btn-join-action joined' : 'btn-join-action'}"
+                        th:data-id="${init.id}" onclick="toggleJoin(this)">
+                    <i th:class="${init.participants.contains(#authentication.principal.user) ? 'fas fa-check' : 'fas fa-plus'}"></i>
+                    <span th:text="${init.participants.contains(#authentication.principal.user) ? 'Joined' : 'Join initiative'}">Join initiative</span>
                 </button>
 
                 <div class="admin-actions" th:if="${init.createdBy?.username == #authentication.name or (#authorization.expression('hasRole(''REPRESENTATIVE'')') and init.community.id == #authentication.principal.communityId)}">
                     <!-- Toggle Official (Only for Representatives) -->
                     <form th:if="${#authorization.expression('hasRole(''REPRESENTATIVE'')') and init.community.id == #authentication.principal.communityId}"
                           th:action="@{/initiatives/{id}/toggle-official(id=${init.id})}" method="post" style="display: inline;">
-                        <button type="submit" class="btn-toggle-official" 
-                                th:text="${init.official ? 'Unmark Official' : 'Mark Official'}"
-                                style="background: none; border: none; color: #8DB392; text-decoration: underline; font-size: 13px; cursor: pointer; padding: 0; font-weight: 500; margin-left: 10px;">
-                            Toggle Official
+                        <button type="submit" class="btn-admin-action official">
+                            <i th:class="${init.official ? 'fas fa-times-circle' : 'fas fa-check-circle'}"></i>
+                            <span th:text="${init.official ? 'Unmark Official' : 'Mark Official'}">Toggle Official</span>
                         </button>
                     </form>
 
                     <form th:action="@{/initiatives/{id}/delete(id=${init.id})}" method="post"
                           onsubmit="return confirm('Vill du verkligen ta bort detta initiativ?');" style="display: inline;">
-                        <button type="submit" class="btn-delete-link">Delete</button>
+                        <button type="submit" class="btn-admin-action delete">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>Delete</span>
+                        </button>
                     </form>
                 </div>
             </div>

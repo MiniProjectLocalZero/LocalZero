@@ -21,6 +21,19 @@ body {
     min-height: calc(100vh - 70px);
 }
 
+.guest-landing {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 100px);
+    text-align: center;
+}
+
+.guest-landing .dashboard-layout {
+    width: 100%;
+}
+
 h1 {
     margin-bottom: 5px;
     font-weight: 500;
@@ -282,6 +295,26 @@ p {
     width: 100%;
     max-width: 700px;
     box-sizing: border-box;
+    position: relative; /* For absolute positioning of tags */
+}
+
+.category-tag {
+    display: inline-block;
+    background-color: var(--light-green-color);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.initiative-card .category-tag {
+    position: absolute;
+    top: 20px;
+    right: 24px;
 }
 
 .card-header {
@@ -365,17 +398,89 @@ p {
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     gap: 8px;
-    transition: background 0.3s;
+    transition: all 0.3s;
+    min-width: 140px;
+    height: 35px;
+    box-sizing: border-box;
 }
 
 .btn-join-action:hover {
     background-color: #729676;
 }
 
-.btn-join-action i {
-    font-size: 11px;
+.btn-join-action.joined {
+    background-color: #546B41;
+}
+
+/* Hover effect for joined state */
+.btn-join-action.joined:hover {
+    background-color: #e74c3c;
+}
+
+.btn-join-action.joined:hover span {
+    display: none;
+}
+
+.btn-join-action.joined:hover::after {
+    content: 'Leave initiative';
+}
+
+/* Change icon to minus on hover when joined */
+.btn-join-action.joined:hover i.fa-check::before {
+    content: "\f068";
+}
+
+/* New Admin Action Styles */
+.btn-admin-action {
+    background-color: #f2f2f2;
+    color: #666;
+    border: 1px solid #ccc;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    height: 35px;
+    text-decoration: none !important;
+}
+
+.btn-admin-action:hover {
+    background-color: #e0e0e0;
+    color: #333;
+    border-color: #999;
+}
+
+.btn-admin-action.delete {
+    color: #cc0000;
+    border-color: #ffcccc;
+}
+
+.btn-admin-action.delete:hover {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+}
+
+.btn-admin-action.official {
+    color: #8DB392;
+    border-color: #d1e7dd;
+}
+
+.btn-admin-action.official:hover {
+    background-color: #f0f4f0;
+    border-color: #8DB392;
+}
+
+.btn-join-action i, .btn-admin-action i {
+    font-size: 12px;
 }
 
 .btn-delete-link {
@@ -406,9 +511,16 @@ p {
 .admin-actions {
     display: flex;
     align-items: center;
+    flex: 1;
+    justify-content: flex-end;
+    gap: 12px;
 }
 
 .heart-icon.liked {
+    color: #e74c3c;
+}
+
+.like-container:hover .heart-icon {
     color: #e74c3c;
 }
 
@@ -553,27 +665,45 @@ p {
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.03);
     border-left: 5px solid var(--light-green-color);
-    transition: transform 0.2s;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .mini-initiative-card:hover {
-    transform: translateX(5px);
+    transform: translateX(8px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
 }
 
 .mini-initiative-card h4 {
-    margin: 0 0 5px 0;
+    margin: 0;
     color: #222;
+    font-size: 1.1rem;
 }
 
 .mini-initiative-card .category-tag {
-    display: inline-block;
-    background: #f0f4f0;
-    color: var(--dark-green-color);
-    font-size: 0.75rem;
-    padding: 3px 10px;
-    border-radius: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
+    align-self: flex-start;
+}
+
+.mini-initiative-card .stats {
+    display: flex;
+    gap: 15px;
+    margin-top: auto;
+}
+
+.mini-initiative-card .admin-actions {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.mini-initiative-card:hover .admin-actions {
+    opacity: 1;
 }
 
 .empty-state {
