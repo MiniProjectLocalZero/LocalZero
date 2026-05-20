@@ -22,10 +22,10 @@
             </div>
 
             <div class="actions" style="margin-top: 15px;">
-                <form th:action="@{/initiatives/{id}/likes(id=${initiative.id})}" method="post" style="display:inline;">
-                    <button type="submit" style="padding: 5px 10px; border: 1px solid #333; background: #fff; cursor: pointer; font-weight: bold;">
-                        <span th:text="${userLikedInitiative != null && userLikedInitiative} ? 'Dislike' : 'Like'">Like</span>
-                        <span th:text="'(' + ${initiativeLikeCount} + ')'">(0)</span>
+                <form th:action="@{/initiatives/{id}/likes(id=${initiative.id})}" method="post" class="like-form">
+                    <button type="submit" class="like-btn" th:classappend="${userLikedInitiative != null && userLikedInitiative} ? 'liked' : ''">
+                        <span th:text="${userLikedInitiative != null && userLikedInitiative} ? '👍 Liked' : '👍 Like'">👍 Like</span>
+                        <span class="like-count" th:text="${initiativeLikeCount}">0</span>
                     </button>
                 </form>
                 <form th:if="${currentUser != null and !#sets.contains(initiative.participants, currentUser) and initiative.createdBy != currentUser}"
@@ -82,10 +82,10 @@
                 <img th:if="${post.imageData != null}" th:src="@{/posts/{id}/image(id=${post.id})}" class="post-image" alt="Post image">
 
                 <div class="post-actions" style="margin-top: 10px;">
-                    <form th:action="@{/initiatives/{iid}/posts/{pid}/likes(iid=${initiative.id},pid=${post.id})}" method="post" style="display:inline;">
-                        <button type="submit" style="padding: 5px 10px; border: 1px solid #333; background: #fff; cursor: pointer; font-weight: bold;">
-                            <span th:text="${likedPostIds != null && likedPostIds.contains(post.id)} ? 'Dislike' : 'Like'">Like</span>
-                            <span th:text="'(' + ${#sets.size(post.likes)} + ')'">(0)</span>
+                    <form th:action="@{/initiatives/{iid}/posts/{pid}/likes(iid=${initiative.id},pid=${post.id})}" method="post" class="like-form">
+                        <button type="submit" class="like-btn" th:classappend="${likedPostIds != null && likedPostIds.contains(post.id)} ? 'liked' : ''">
+                            <span th:text="${likedPostIds != null && likedPostIds.contains(post.id)} ? '👍 Liked' : '👍 Like'">👍 Like</span>
+                            <span class="like-count" th:text="${#sets.size(post.likes)}">0</span>
                         </button>
                     </form>
                 </div>
@@ -101,10 +101,10 @@
                             <span th:text="${comment.createdAt}">Date</span>
                         </div>
                         <p th:text="${comment.content}" style="margin: 2px 0;">Content</p>
-                        <form th:action="@{/initiatives/{iid}/posts/{pid}/comments/{cid}/likes(iid=${initiative.id},pid=${post.id},cid=${comment.id})}" method="post" style="display:inline;">
-                            <button type="submit" style="padding: 4px 8px; border: 1px solid #333; background: #fff; cursor: pointer; font-weight: bold; font-size: 0.9em;">
-                                <span th:text="${likedCommentIds != null && likedCommentIds.contains(comment.id)} ? 'Dislike' : 'Like'">Like</span>
-                                <span th:text="'(' + ${commentLikeCounts != null ? commentLikeCounts.get(comment.id) : 0} + ')'">(0)</span>
+                        <form th:action="@{/initiatives/{iid}/posts/{pid}/comments/{cid}/likes(iid=${initiative.id},pid=${post.id},cid=${comment.id})}" method="post" class="like-form">
+                            <button type="submit" class="like-btn small" th:classappend="${likedCommentIds != null && likedCommentIds.contains(comment.id)} ? 'liked' : ''">
+                                <span th:text="${likedCommentIds != null && likedCommentIds.contains(comment.id)} ? '👍 Liked' : '👍 Like'">👍 Like</span>
+                                <span class="like-count" th:text="${commentLikeCounts != null ? commentLikeCounts.get(comment.id) : 0}">0</span>
                             </button>
                         </form>
                     </div>
