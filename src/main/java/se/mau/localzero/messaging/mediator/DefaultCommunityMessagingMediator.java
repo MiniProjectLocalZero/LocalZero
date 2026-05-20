@@ -4,13 +4,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import se.mau.localzero.domain.Community;
 import se.mau.localzero.domain.Message;
 import se.mau.localzero.domain.User;
+import se.mau.localzero.messaging.command.BroadcastMessageCommand;
 import se.mau.localzero.messaging.command.MessageCommandInvoker;
 import se.mau.localzero.messaging.command.SendMessageCommand;
 import se.mau.localzero.messaging.exception.InvalidMessageException;
 import se.mau.localzero.messaging.repository.MessageRepository;
 import se.mau.localzero.messaging.validator.ValidationChain;
+
+import java.util.List;
 
 /**
  * Default implementation of CommunityMessagingMediator.
@@ -74,5 +78,34 @@ public class DefaultCommunityMessagingMediator implements CommunityMessagingMedi
         logger.debug("Step 4: Notification created ✓");
 
         logger.info("Message workflow completed successfully: {} → {}", sender.getUsername(), receiver.getUsername());
+    }
+
+    @Override
+    @Transactional
+    public void broadcastMessage(User sender, Community community, String content) {
+        logger.info("Starting broadcast workflow: {} → community {}", sender.getUsername(), community.getName());
+
+        BroadcastMessageCommand command = new BroadcastMessageCommand(
+                sender,
+                community,
+                content,
+                messageRepository
+        );
+
+        boolean commandExecuted = messageCommandInvoker.execute(command);
+        if (!commandExecuted) {
+            throw new InvalidMessageException("Failed to execute BroadcastMessageCommand");
+        }
+
+        List<Message> createdMessages = command.getCreatedMessages();
+        logger.debug("Broadcast messages created and saved ✓");
+
+        logger.debug("Creating notifications for broadcast");
+        for (Message msg : createdMessages) {
+            notificationMediator.sendMessageNotification(sender, msg.getReceiver(), msg, false);
+        }
+        logger.debug("Broadcast notifications created ✓");
+
+        logger.info("Broadcast workflow completed successfully: {} messages sent", createdMessages.size());
     }
 }

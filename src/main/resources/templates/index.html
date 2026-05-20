@@ -43,6 +43,12 @@
                                 <span class="category-tag" th:text="${initiative.category}">CATEGORY</span>
                                 <h4 th:text="${initiative.title}" style="margin-top: 10px;">Initiative Title</h4>
                                 <p th:text="${#strings.abbreviate(initiative.description, 100)}" style="font-size: 0.9rem; color: #555; margin: 10px 0;">Description...</p>
+                                <div class="admin-actions" th:if="${initiative.createdBy?.username == #authentication.name or (#authorization.expression('hasRole(''REPRESENTATIVE'')') and initiative.community.id == #authentication.principal.communityId)}" style="margin-top: 5px;">
+                                    <form th:action="@{/initiatives/{id}/delete(id=${initiative.id})}" method="post"
+                                          onsubmit="return confirm('Vill du verkligen ta bort detta initiativ?');">
+                                        <button type="submit" class="btn-delete-link" style="margin-left: 0;">Delete</button>
+                                    </form>
+                                </div>
                             </div>
                             <div class="stats" style="flex-direction: column; align-items: flex-end; gap: 5px;">
                                 <div class="metric"><span th:text="${initiative.participants.size()}">0</span> participants</div>
@@ -69,6 +75,15 @@
                         <span class="stat-label">Sustainable Actions</span>
                     </div>
                     <a th:href="@{/sustainability/log}" class="btn-primary" style="display: block; text-align: center; margin-top: 10px; font-size: 0.9rem;">Log New Action</a>
+                </div>
+
+                <div class="impact-card" th:if="${isRepresentative}" style="margin-top: 20px; border-color: var(--dark-green-color);">
+                    <h3>Community Impact</h3>
+                    <div class="impact-stat">
+                        <span class="stat-value" style="color: var(--dark-green-color);"><span th:text="${#numbers.formatDecimal(communityCarbonSaving, 1, 1)}">0.0</span> kg</span>
+                        <span class="stat-label">Total CO2 Saved</span>
+                    </div>
+                    <p style="font-size: 0.8rem; color: #666; margin-top: 10px;">Showing cumulative impact for all members of <span th:text="${communityName}">Community</span>.</p>
                 </div>
             </aside>
         </div>

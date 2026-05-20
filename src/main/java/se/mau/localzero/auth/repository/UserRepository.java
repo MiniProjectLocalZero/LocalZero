@@ -17,4 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
     Optional<List<User>> findByCommunity(Community community);
+
+    List<User> findByRolesContaining(se.mau.localzero.domain.UserRole role);
 }

@@ -6,13 +6,20 @@ import se.mau.localzero.domain.SustainabilityAction;
 import se.mau.localzero.domain.User;
 import se.mau.localzero.sustainability.dto.SustainabilityActionDto;
 import se.mau.localzero.sustainability.repository.SustainabilityActionRepository;
+import se.mau.localzero.sustainability.strategy.CommunityAnalyticsStrategy;
+import se.mau.localzero.sustainability.strategy.PersonalAnalyticsStrategy;
+import se.mau.localzero.sustainability.strategy.SustainabilityAnalyticsStrategy;
 
 @Service
 public class SustainabilityActionService {
     private final SustainabilityActionRepository repository;
+    private final SustainabilityAnalyticsStrategy personalStrategy;
+    private final SustainabilityAnalyticsStrategy communityStrategy;
 
     public SustainabilityActionService(SustainabilityActionRepository repository) {
         this.repository = repository;
+        this.personalStrategy = new PersonalAnalyticsStrategy(repository);
+        this.communityStrategy = new CommunityAnalyticsStrategy(repository);
     }
 
     public void logAction(SustainabilityActionDto dto, User currentUser) {
@@ -25,6 +32,14 @@ public class SustainabilityActionService {
 
         // Save repo to database
         repository.save(action);
+    }
+
+    public double getPersonalImpact(User user) {
+        return personalStrategy.calculateTotalSavings(user);
+    }
+
+    public double getCommunityImpact(User user) {
+        return communityStrategy.calculateTotalSavings(user);
     }
 
     private double generateMockCarbonSaving(Category category) {

@@ -51,6 +51,18 @@
                 </select>
             </div>
 
+            <div class="input-group">
+                <label><span class="required">*</span> Choose your role(s)</label>
+                <div style="display: flex; gap: 20px; margin-top: 10px;">
+                    <label class="remember-me">
+                        <input type="checkbox" name="roles" value="RESIDENT" checked> Resident
+                    </label>
+                    <label class="remember-me">
+                        <input type="checkbox" name="roles" value="REPRESENTATIVE"> Community Organizer
+                    </label>
+                </div>
+            </div>
+
             <button type="submit" class="login-btn">Register</button>
             <p>Already have an account? <a id="signup" th:href="@{/auth/login}">Sign in</a></p>
         </div>

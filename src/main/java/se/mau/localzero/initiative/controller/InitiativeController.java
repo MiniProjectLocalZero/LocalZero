@@ -110,15 +110,31 @@ public class InitiativeController {
     @PostMapping("/{id}/delete")
     public String deleteInitiative(@PathVariable Long id,
                                    @AuthenticationPrincipal UserDetails userDetails) {
-        Initiative initiative = initiativeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Initiative not found"));
+        try {
+            User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        //only creator can delete
-        if (!initiative.getCreatedBy().getUsername().equals(userDetails.getUsername())) {
-            return "redirect:/initiatives?error=You are not the owner of this initiative";
+            initiativeService.deleteInitiative(id, currentUser);
+            return "redirect:/initiatives?success";
+        } catch (Exception e) {
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/initiatives?error=" + errorMessage;
         }
-        initiativeRepository.delete(initiative);
-        return "redirect:/initiatives?success";
+    }
+
+    @PostMapping("/{id}/toggle-official")
+    public String toggleOfficial(@PathVariable Long id,
+                                 @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            initiativeService.toggleOfficialStatus(id, currentUser);
+            return "redirect:/initiatives?success";
+        } catch (Exception e) {
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/initiatives?error=" + errorMessage;
+        }
     }
 
     @PostMapping("/{id}/like")

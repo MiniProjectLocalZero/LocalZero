@@ -17,4 +17,5 @@ public class UserSummaryDTO {
     private Long id;
     private String username;
     private String communityName;
+    private boolean isRepresentative;
 }

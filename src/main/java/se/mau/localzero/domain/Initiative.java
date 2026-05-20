@@ -47,6 +47,9 @@ public class Initiative {
     @Column(nullable = false)
     private Visibility visibility;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isOfficial = false;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
