@@ -29,8 +29,8 @@ public class PostService {
         Initiative initiative = initiativeRepository.findById(initiativeId)
                 .orElseThrow(() -> new RuntimeException("Initiative not found"));
 
-        if (!initiative.getParticipants().contains(author) && !initiative.getCreatedBy().equals(author)) {
-            throw new RuntimeException("You must join the initiative before posting updates");
+        if (!initiative.getCreatedBy().getId().equals(author.getId())) {
+            throw new RuntimeException("Only the initiative owner can post updates");
         }
 
         Post post = postFactory.createPost(dto, author, initiative);

@@ -77,11 +77,10 @@ public class Initiative {
 
     @ManyToMany
     @JoinTable(
-            name = "initiative_likes",
+            name = "initiative_user_likes",
             joinColumns = @JoinColumn(name = "initiative_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-
     private Set<User> likes = new HashSet<>();
 
     @OneToMany(mappedBy = "initiative", fetch = FetchType.LAZY)

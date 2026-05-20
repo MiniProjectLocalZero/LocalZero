@@ -15,31 +15,32 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = {"user", "initiative"})
-@Table(
-        name = "initiative_likes",
-        uniqueConstraints = @UniqueConstraint(name = "uk_initiative_likes_user_initiative", columnNames = {"user_id", "initiative_id"})
-)
-public class InitiativeLike {
+@ToString(exclude = {"author", "initiative"})
+@Table(name = "initiative_comments")
+public class InitiativeComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(nullable = false, length = 3000)
+    private String content;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "initiative_id", nullable = false)
     private Initiative initiative;
 
-    public InitiativeLike(User user, Initiative initiative) {
-        this.user = user;
+    public InitiativeComment(String content, User author, Initiative initiative) {
+        this.content = content;
+        this.author = author;
         this.initiative = initiative;
     }
 

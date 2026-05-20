@@ -3,23 +3,20 @@ package se.mau.localzero.initiative.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.mau.localzero.domain.Initiative;
-import se.mau.localzero.domain.InitiativeLike;
 import se.mau.localzero.domain.User;
-import se.mau.localzero.initiative.repository.InitiativeLikeRepository;
 import se.mau.localzero.initiative.repository.InitiativeRepository;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class InitiativeLikeService {
-    private final InitiativeLikeRepository initiativeLikeRepository;
     private final InitiativeRepository initiativeRepository;
 
-    public InitiativeLikeService(InitiativeLikeRepository initiativeLikeRepository, InitiativeRepository initiativeRepository) {
-        this.initiativeLikeRepository = initiativeLikeRepository;
+    public InitiativeLikeService(InitiativeRepository initiativeRepository) {
         this.initiativeRepository = initiativeRepository;
     }
 
@@ -28,37 +25,46 @@ public class InitiativeLikeService {
         Initiative initiative = initiativeRepository.findById(initiativeId)
                 .orElseThrow(() -> new RuntimeException("Initiative not found"));
 
-        initiativeLikeRepository.findByUserIdAndInitiativeId(user.getId(), initiativeId)
-                .ifPresentOrElse(
-                        initiativeLikeRepository::delete,
-                        () -> initiativeLikeRepository.save(new InitiativeLike(user, initiative))
-                );
+        boolean alreadyLiked = initiative.getLikes().stream()
+                .anyMatch(u -> u.getId().equals(user.getId()));
+
+        if (alreadyLiked) {
+            initiative.removeLike(user);
+        } else {
+            initiative.addLike(user);
+        }
+        initiativeRepository.save(initiative);
     }
 
     @Transactional(readOnly = true)
     public long countLikes(Long initiativeId) {
-        return initiativeLikeRepository.countByInitiativeId(initiativeId);
+        Initiative initiative = initiativeRepository.findById(initiativeId)
+                .orElseThrow(() -> new RuntimeException("Initiative not found"));
+        return initiative.getLikes().size();
     }
 
     @Transactional(readOnly = true)
     public boolean hasUserLiked(Long initiativeId, Long userId) {
-        return initiativeLikeRepository.findByUserIdAndInitiativeId(userId, initiativeId).isPresent();
+        Initiative initiative = initiativeRepository.findById(initiativeId)
+                .orElseThrow(() -> new RuntimeException("Initiative not found"));
+        return initiative.getLikes().stream()
+                .anyMatch(u -> u.getId().equals(userId));
     }
 
     @Transactional(readOnly = true)
     public Set<Long> findLikedInitiativeIdsByUser(Long userId) {
-        return initiativeLikeRepository.findLikedInitiativeIdsByUserId(userId);
+        return initiativeRepository.findAll().stream()
+                .filter(i -> i.getLikes().stream().anyMatch(u -> u.getId().equals(userId)))
+                .map(Initiative::getId)
+                .collect(Collectors.toSet());
     }
 
     @Transactional(readOnly = true)
     public Map<Long, Long> countLikesByInitiativeIds(List<Long> initiativeIds) {
-        List<Object[]> results = initiativeLikeRepository.countLikesByInitiativeIds(initiativeIds);
         Map<Long, Long> map = new HashMap<>();
-        for (Object[] result : results) {
-            map.put((Long) result[0], (Long) result[1]);
-        }
         for (Long id : initiativeIds) {
-            map.putIfAbsent(id, 0L);
+            Initiative initiative = initiativeRepository.findById(id).orElse(null);
+            map.put(id, initiative != null ? (long) initiative.getLikes().size() : 0L);
         }
         return map;
     }

@@ -11,5 +11,6 @@ RUN ./mvnw clean package -DskipTests -B
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
+COPY --from=builder /app/src/main/java/se/mau/localzero/auth/observer/SessionLogger.txt src/main/java/se/mau/localzero/auth/observer/SessionLogger.txt
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

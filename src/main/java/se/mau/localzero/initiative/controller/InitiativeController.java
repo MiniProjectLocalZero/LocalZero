@@ -14,6 +14,7 @@ import se.mau.localzero.initiative.dto.PostDto;
 import se.mau.localzero.initiative.repository.InitiativeRepository;
 import se.mau.localzero.initiative.service.CommentLikeService;
 import se.mau.localzero.initiative.service.CommentService;
+import se.mau.localzero.initiative.service.InitiativeCommentService;
 import se.mau.localzero.initiative.service.InitiativeLikeService;
 import se.mau.localzero.initiative.service.InitiativeService;
 import se.mau.localzero.initiative.service.LikeService;
@@ -40,6 +41,7 @@ public class InitiativeController {
     private final LikeService likeService;
     private final InitiativeLikeService initiativeLikeService;
     private final CommentLikeService commentLikeService;
+    private final InitiativeCommentService initiativeCommentService;
     private final InitiativeRepository initiativeRepository;
     private final NotificationMediator notificationMediator;
     private final NotificationRepository notificationRepository;
@@ -51,6 +53,7 @@ public class InitiativeController {
                                 LikeService likeService,
                                 InitiativeLikeService initiativeLikeService,
                                 CommentLikeService commentLikeService,
+                                InitiativeCommentService initiativeCommentService,
                                 InitiativeRepository initiativeRepository,
                                 NotificationMediator notificationMediator,
                                 NotificationRepository notificationRepository) {
@@ -61,6 +64,7 @@ public class InitiativeController {
         this.likeService = likeService;
         this.initiativeLikeService = initiativeLikeService;
         this.commentLikeService = commentLikeService;
+        this.initiativeCommentService = initiativeCommentService;
         this.initiativeRepository = initiativeRepository;
         this.notificationMediator = notificationMediator;
         this.notificationRepository = notificationRepository;
@@ -104,6 +108,11 @@ public class InitiativeController {
             if (currentUser != null) {
                 List<Initiative> visibleList = initiativeRepository.findVisibleInitiatives(currentUser.getCommunity().getId());
                 model.addAttribute("initiatives", visibleList);
+                Set<Long> likedInitiativeIds = visibleList.stream()
+                        .filter(i -> i.getLikes().stream().anyMatch(u -> u.getId().equals(currentUser.getId())))
+                        .map(Initiative::getId)
+                        .collect(Collectors.toSet());
+                model.addAttribute("likedInitiativeIds", likedInitiativeIds);
                 return "initiative-list";
             }
         }
@@ -155,6 +164,7 @@ public class InitiativeController {
         model.addAttribute("posts", posts);
         model.addAttribute("postDto", new PostDto());
         model.addAttribute("initiativeLikeCount", initiativeLikeService.countLikes(id));
+        model.addAttribute("initiativeComments", initiativeCommentService.getCommentsByInitiative(id));
 
         if (userDetails != null) {
             User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
@@ -258,9 +268,11 @@ public class InitiativeController {
             User user = userRepository.findByUsername(userDetails.getUsername())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
+            boolean alreadyLiked = initiative.getLikes().stream()
+                    .anyMatch(u -> u.getId().equals(user.getId()));
             boolean isLiked;
 
-            if (initiative.getLikes().contains(user)) {
+            if (alreadyLiked) {
                 initiative.removeLike(user);
                 isLiked = false;
             } else {
@@ -379,6 +391,22 @@ public class InitiativeController {
         }
     }
 
+    @PostMapping("/{id}/comments")
+    public String addInitiativeComment(@PathVariable Long id,
+                                       @RequestParam("content") String content,
+                                       @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            initiativeCommentService.addComment(id, currentUser, content);
+            return "redirect:/initiatives/" + id + "?commented";
+        } catch (Exception e) {
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/initiatives/" + id + "?error=" + errorMessage;
+        }
+    }
+
     @PostMapping("/{id}/likes")
     public String toggleInitiativeLike(@PathVariable Long id,
                                        @AuthenticationPrincipal UserDetails userDetails) {
@@ -387,10 +415,10 @@ public class InitiativeController {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             initiativeLikeService.toggleLike(id, currentUser);
-            return "redirect:/initiatives?liked";
+            return "redirect:/initiatives/" + id + "?liked";
         } catch (Exception e) {
             String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
-            return "redirect:/initiatives?error=" + errorMessage;
+            return "redirect:/initiatives/" + id + "?error=" + errorMessage;
         }
     }
 
