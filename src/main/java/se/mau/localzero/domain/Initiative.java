@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +19,9 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@Component
+@Service
+@Repository
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = {"createdBy", "community", "participants", "posts"})
@@ -47,6 +53,9 @@ public class Initiative {
     @Column(nullable = false)
     private Visibility visibility;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isOfficial = false;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -65,6 +74,15 @@ public class Initiative {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> participants = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "initiative_likes",
+            joinColumns = @JoinColumn(name = "initiative_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+
+    private Set<User> likes = new HashSet<>();
 
     @OneToMany(mappedBy = "initiative", fetch = FetchType.LAZY)
     private Set<Post> posts = new HashSet<>();
@@ -131,6 +149,14 @@ public class Initiative {
         if (post != null && posts.remove(post)) {
             post.setInitiative(null);
         }
+    }
+
+    public void addLike(User user) {
+        this.likes.add(user);
+    }
+
+    public void removeLike(User user) {
+        this.likes.remove(user);
     }
 
     @PrePersist

@@ -21,6 +21,19 @@ body {
     min-height: calc(100vh - 70px);
 }
 
+.guest-landing {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 100px);
+    text-align: center;
+}
+
+.guest-landing .dashboard-layout {
+    width: 100%;
+}
+
 h1 {
     margin-bottom: 5px;
     font-weight: 500;
@@ -147,7 +160,6 @@ p {
     box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Behållare för fält som ska ligga sida vid sida */
 .input-row {
     display: flex;
     gap: 15px;
@@ -159,7 +171,7 @@ p {
     flex-direction: column;
     margin-bottom: 15px;
     width: 100%;
-    text-align: left; /* Texten ska vara till vänster */
+    text-align: left;
 }
 
 .input-group label {
@@ -205,30 +217,9 @@ p {
     padding: 20px;
 }
 
-.initiative-card {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 15px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 200px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
 .card-content h3 {
     margin: 10px 0;
     font-size: 1.2rem;
-}
-
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #f5f5f5;
 }
 
 .stats {
@@ -273,6 +264,707 @@ p {
     font-weight: 600;
 }
 
+.creator-box {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.creator-name {
+    font-weight: 600;
+    color: #8DB392;
+}
+
+.initiatives-feed {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    padding: 40px 20px;
+    width: 100%;
+}
+
+.initiative-card {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 24px;
+    width: 100%;
+    max-width: 700px;
+    box-sizing: border-box;
+    position: relative; /* For absolute positioning of tags */
+}
+
+.category-tag {
+    display: inline-block;
+    background-color: var(--light-green-color);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.initiative-card .category-tag {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #333;
+    border-radius: 50%;
+    position: relative;
+}
+
+.avatar-placeholder::before, .avatar-placeholder::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: #333;
+    top: 50%;
+    left: 0;
+}
+.avatar-placeholder::before { transform: rotate(45deg); }
+.avatar-placeholder::after { transform: rotate(-45deg); }
+
+.header-text h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.meta-info {
+    margin: 0 !important;
+    font-size: 12px;
+    color: #888;
+}
+
+.card-body h3 {
+    margin: 15px 0 10px 0;
+}
+
+.card-body p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+}
+
+.metric {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #666;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.engagement {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.btn-join-action {
+    background-color: #8DB392;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s;
+    min-width: 140px;
+    height: 35px;
+    box-sizing: border-box;
+}
+
+.btn-join-action:hover {
+    background-color: #729676;
+}
+
+.btn-join-action.joined {
+    background-color: #546B41;
+}
+
+/* Hover effect for joined state */
+.btn-join-action.joined:hover {
+    background-color: #e74c3c;
+}
+
+.btn-join-action.joined:hover span {
+    display: none;
+}
+
+.btn-join-action.joined:hover::after {
+    content: 'Leave initiative';
+}
+
+/* Change icon to minus on hover when joined */
+.btn-join-action.joined:hover i.fa-check::before {
+    content: "\f068";
+}
+
+/* New Admin Action Styles */
+.btn-admin-action {
+    background-color: #f2f2f2;
+    color: #666;
+    border: 1px solid #ccc;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    height: 35px;
+    text-decoration: none !important;
+}
+
+.btn-admin-action:hover {
+    background-color: #e0e0e0;
+    color: #333;
+    border-color: #999;
+}
+
+.btn-admin-action.delete {
+    color: #cc0000;
+    border-color: #ffcccc;
+}
+
+.btn-admin-action.delete:hover {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+}
+
+.btn-admin-action.official {
+    color: #8DB392;
+    border-color: #d1e7dd;
+}
+
+.btn-admin-action.official:hover {
+    background-color: #f0f4f0;
+    border-color: #8DB392;
+}
+
+.btn-join-action i, .btn-admin-action i {
+    font-size: 12px;
+}
+
+.btn-delete-link {
+    background: none;
+    border: none;
+    color: #cc0000;
+    text-decoration: underline;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    font-weight: 500;
+    margin-left: 10px;
+}
+
+.btn-delete-link:hover {
+    color: #ff0000;
+    text-decoration: none;
+}
+
+.card-header {
+    margin-bottom: 10px;
+}
+ .header-text h4 {
+     color: #333;
+     font-size: 16px;
+     margin-bottom: 2px;
+ }
+.admin-actions {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.heart-icon.liked {
+    color: #e74c3c;
+}
+
+.like-container:hover .heart-icon {
+    color: #e74c3c;
+}
+
+.like-container {
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Homepage Redesign */
+.homepage-container {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.hero-section {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.hero-section h1 {
+    font-size: 2.5rem;
+    color: var(--dark-green-color);
+    margin-bottom: 10px;
+}
+
+.hero-section h2 {
+    font-size: 1.25rem;
+    color: #666;
+    font-weight: 400;
+    margin-bottom: 30px;
+}
+
+.about-text {
+    max-width: 800px;
+    margin: 0 auto 40px;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #444;
+}
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn-primary {
+    background-color: var(--dark-green-color);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.btn-secondary {
+    background-color: white;
+    color: var(--dark-green-color);
+    border: 2px solid var(--dark-green-color);
+    padding: 10px 30px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.btn-primary:hover, .btn-secondary:hover {
+    transform: translateY(-2px);
+}
+
+.quick-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 30px;
+}
+
+.impact-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    height: fit-content;
+}
+
+.impact-card h3 {
+    margin-top: 0;
+    color: var(--dark-green-color);
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.impact-stat {
+    margin-bottom: 20px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--dark-green-color);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.initiative-preview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.mini-initiative-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    border-left: 5px solid var(--light-green-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.mini-initiative-card:hover {
+    transform: translateX(8px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.mini-initiative-card h4 {
+    margin: 0;
+    color: #222;
+    font-size: 1.1rem;
+}
+
+.mini-initiative-card .category-tag {
+    align-self: flex-start;
+}
+
+.mini-initiative-card .stats {
+    display: flex;
+    gap: 15px;
+    margin-top: auto;
+}
+
+.mini-initiative-card .admin-actions {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.mini-initiative-card:hover .admin-actions {
+    opacity: 1;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 12px;
+    color: #888;
+}
+
+/* Profile Page Styles */
+.profile-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.profile-header {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-user-info h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: var(--dark-green-color);
+}
+
+.profile-user-info p {
+    margin: 5px 0 0;
+    color: #666;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.profile-stat-item {
+    text-align: center;
+}
+
+.profile-stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--dark-green-color);
+}
+
+.profile-stat-label {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.profile-section {
+    margin-bottom: 40px;
+}
+
+.profile-section h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--light-green-color);
+    padding-bottom: 10px;
+    display: inline-block;
+}
+
+.profile-initiative-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.profile-initiative-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    border-left: 5px solid var(--light-green-color);
+    transition: transform 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.profile-initiative-card:hover {
+    transform: translateY(-5px);
+}
+
+.profile-initiative-card h3 {
+    margin: 0 0 10px;
+    color: var(--dark-green-color);
+}
+
+.profile-initiative-card p {
+    margin: 0 0 15px;
+    font-size: 0.9rem;
+    color: #666;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.profile-initiative-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.no-data-message {
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
+
+@media (max-width: 600px) {
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .profile-stats {
+        justify-content: center;
+    }
+}
+
+/* Initiative Creation Form */
+.initiative-form-container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.initiative-form-container h1 {
+    color: var(--dark-green-color);
+    margin-bottom: 10px;
+}
+
+.initiative-form-container .description-text {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    transition: all 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--dark-green-color);
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(84, 107, 65, 0.1);
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.btn-submit {
+    background-color: var(--dark-green-color);
+    color: white;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.btn-submit:hover {
+    background-color: #455a36;
+}
+
+.btn-submit:active {
+    transform: translateY(1px);
+}
+
+.footer-link {
+    display: block;
+    text-align: center;
+    margin-top: 25px;
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+    color: var(--dark-green-color);
+}
+
+.error-container {
+    background-color: #fee2e2;
+    border-left: 4px solid #ef4444;
+    color: #b91c1c;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+}
+
 .like-form {
     display: inline;
 }
@@ -306,16 +998,16 @@ p {
 }
 
 .like-btn.liked {
-    background: #fff5f5;
-    border-color: #e07070;
-    color: #c44545;
+    background: #f0f5ec;
+    border-color: #546B41;
+    color: #3a4f2a;
 }
 
 .like-btn.liked:hover {
-    background: #ffeaea;
-    border-color: #d63030;
-    color: #a83232;
-    box-shadow: 0 2px 6px rgba(196, 69, 69, 0.12);
+    background: #e4ebd9;
+    border-color: #3a4f2a;
+    color: #2a3a1e;
+    box-shadow: 0 2px 6px rgba(84, 107, 65, 0.12);
 }
 
 .like-count {

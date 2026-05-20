@@ -1,16 +1,17 @@
 package se.mau.localzero.initiative.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import se.mau.localzero.domain.Comment;
-import se.mau.localzero.domain.Initiative;
-import se.mau.localzero.domain.Post;
-import se.mau.localzero.domain.User;
+import se.mau.localzero.domain.*;
 import se.mau.localzero.initiative.dto.InitiativeDto;
 import se.mau.localzero.initiative.dto.PostDto;
+import se.mau.localzero.initiative.repository.InitiativeRepository;
 import se.mau.localzero.initiative.service.CommentLikeService;
 import se.mau.localzero.initiative.service.CommentService;
 import se.mau.localzero.initiative.service.InitiativeLikeService;
@@ -18,6 +19,8 @@ import se.mau.localzero.initiative.service.InitiativeService;
 import se.mau.localzero.initiative.service.LikeService;
 import se.mau.localzero.initiative.service.PostService;
 import se.mau.localzero.auth.repository.UserRepository;
+import se.mau.localzero.messaging.mediator.NotificationMediator;
+import se.mau.localzero.messaging.repository.NotificationRepository;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -37,10 +40,20 @@ public class InitiativeController {
     private final LikeService likeService;
     private final InitiativeLikeService initiativeLikeService;
     private final CommentLikeService commentLikeService;
+    private final InitiativeRepository initiativeRepository;
+    private final NotificationMediator notificationMediator;
+    private final NotificationRepository notificationRepository;
 
-    public InitiativeController(InitiativeService initiativeService, PostService postService, UserRepository userRepository,
-                                CommentService commentService, LikeService likeService,
-                                InitiativeLikeService initiativeLikeService, CommentLikeService commentLikeService) {
+    public InitiativeController(InitiativeService initiativeService,
+                                PostService postService,
+                                UserRepository userRepository,
+                                CommentService commentService,
+                                LikeService likeService,
+                                InitiativeLikeService initiativeLikeService,
+                                CommentLikeService commentLikeService,
+                                InitiativeRepository initiativeRepository,
+                                NotificationMediator notificationMediator,
+                                NotificationRepository notificationRepository) {
         this.initiativeService = initiativeService;
         this.postService = postService;
         this.userRepository = userRepository;
@@ -48,6 +61,9 @@ public class InitiativeController {
         this.likeService = likeService;
         this.initiativeLikeService = initiativeLikeService;
         this.commentLikeService = commentLikeService;
+        this.initiativeRepository = initiativeRepository;
+        this.notificationMediator = notificationMediator;
+        this.notificationRepository = notificationRepository;
     }
 
     //shows the page for creating a new initiative
@@ -74,27 +90,56 @@ public class InitiativeController {
             return "redirect:/initiatives?success";
 
         } catch (Exception e) {
+            e.printStackTrace();
             String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
             return "redirect:/initiatives/create?error=" + e.getMessage();
         }
     }
 
     @GetMapping
-    public String listInitiatives(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        List<Initiative> initiatives = initiativeService.getAllInitiatives();
-        model.addAttribute("initiatives", initiatives);
-
+    public String listInitiatives(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails != null) {
             User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
             model.addAttribute("currentUser", currentUser);
             if (currentUser != null) {
-                List<Long> initiativeIds = initiatives.stream().map(Initiative::getId).toList();
-                model.addAttribute("initiativeLikeCounts", initiativeLikeService.countLikesByInitiativeIds(initiativeIds));
-                model.addAttribute("likedInitiativeIds", initiativeLikeService.findLikedInitiativeIdsByUser(currentUser.getId()));
+                List<Initiative> visibleList = initiativeRepository.findVisibleInitiatives(currentUser.getCommunity().getId());
+                model.addAttribute("initiatives", visibleList);
+                return "initiative-list";
             }
         }
-
+        model.addAttribute("initiatives", initiativeRepository.findAll());
         return "initiative-list";
+    }
+
+    @PostMapping("/{id}/toggle-visibility")
+    @ResponseBody
+    public ResponseEntity<?> toggleVisibility(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+
+        try {
+            //get initiatives
+            Initiative initiative = initiativeRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Initiative not found"));
+
+            //check owner
+            if (!initiative.getCreatedBy().getUsername().equals(userDetails.getUsername())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "You are not the owner of this initiative"));
+            }
+
+            //change status
+            Visibility current = initiative.getVisibility();
+            Visibility next = (current == Visibility.PUBLIC) ? Visibility.PUBLIC : Visibility.PUBLIC;
+            initiative.setVisibility(next);
+            initiativeRepository.save(initiative);
+
+            return ResponseEntity.ok(Map.of(
+                    "succes", true,
+                    "newVisibility", next,
+                    "message", "Visibility changed" + next
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}")
@@ -173,34 +218,132 @@ public class InitiativeController {
         }
     }
 
-    @PostMapping("/{initiativeId}/posts/{postId}/likes")
-    public String toggleLike(@PathVariable Long initiativeId,
-                             @PathVariable Long postId,
-                             @AuthenticationPrincipal UserDetails userDetails) {
+    @PostMapping("/{id}/delete")
+    public String deleteInitiative(@PathVariable Long id,
+                                   @AuthenticationPrincipal UserDetails userDetails) {
         try {
             User currentUser = userRepository.findByUsername(userDetails.getUsername())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            likeService.toggleLike(postId, currentUser);
-            return "redirect:/initiatives/" + initiativeId + "?liked";
-        } catch (Exception e) {
-            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
-            return "redirect:/initiatives/" + initiativeId + "?error=" + errorMessage;
-        }
-    }
-
-    @PostMapping("/{id}/likes")
-    public String toggleInitiativeLike(@PathVariable Long id,
-                                       @AuthenticationPrincipal UserDetails userDetails) {
-        try {
-            User currentUser = userRepository.findByUsername(userDetails.getUsername())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
-            initiativeLikeService.toggleLike(id, currentUser);
-            return "redirect:/initiatives?liked";
+            initiativeService.deleteInitiative(id, currentUser);
+            return "redirect:/initiatives?success";
         } catch (Exception e) {
             String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
             return "redirect:/initiatives?error=" + errorMessage;
+        }
+    }
+
+    @PostMapping("/{id}/toggle-official")
+    public String toggleOfficial(@PathVariable Long id,
+                                 @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            initiativeService.toggleOfficialStatus(id, currentUser);
+            return "redirect:/initiatives?success";
+        } catch (Exception e) {
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/initiatives?error=" + errorMessage;
+        }
+    }
+
+    @PostMapping("/{id}/like")
+    @ResponseBody
+    public ResponseEntity<?> toggleLikeAjax(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            Initiative initiative = initiativeRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Initiative not found"));
+
+            User user = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            boolean isLiked;
+
+            if (initiative.getLikes().contains(user)) {
+                initiative.removeLike(user);
+                isLiked = false;
+            } else {
+                initiative.addLike(user);
+                isLiked = true;
+
+                if (!initiative.getCreatedBy().getId().equals(user.getId())) {
+                    String title = user.getUsername() + " liked your initiative";
+                    String message = user.getUsername() + " liked '" + initiative.getTitle() + "'";
+
+                    Notification notification = new Notification(
+                            title,
+                            message,
+                            initiative.getCreatedBy(),
+                            NotificationEntityType.INITIATIVE,
+                            initiative.getId()
+                    );
+
+                    notificationRepository.save(notification);
+                }
+
+            }
+
+            initiativeRepository.save(initiative);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "newLikeCount", initiative.getLikes().size(),
+                    "isLiked", isLiked
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "error", e.getMessage()));
+        }
+    }
+
+    @PostMapping(value = "/{id}/join", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> toggleParticipationAjax(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            Initiative initiative = initiativeRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Initiative not found"));
+            User user = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            boolean isParticipating;
+
+            if (initiative.getParticipants().contains(user)) {
+                initiative.removeParticipant(user);
+                isParticipating = false;
+            } else {
+                initiative.addParticipant(user);
+                isParticipating = true;
+
+                if (!initiative.getCreatedBy().getId().equals(user.getId())) {
+                    String title = user.getUsername() + " joined your initiative";
+                    String message = user.getUsername() + " has joined '" + initiative.getTitle() + "'";
+
+                    Notification notification = new Notification(
+                            title,
+                            message,
+                            initiative.getCreatedBy(),
+                            NotificationEntityType.INITIATIVE,
+                            initiative.getId()
+                    );
+
+                    notificationRepository.save(notification);
+                }
+            }
+
+            initiativeRepository.save(initiative);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "newParticipantCount", initiative.getParticipants().size(),
+                    "isParticipating", isParticipating
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "error", e.getMessage()));
+
         }
     }
 
@@ -233,6 +376,37 @@ public class InitiativeController {
         } catch (Exception e) {
             String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
             return "redirect:/initiatives?error=" + errorMessage;
+        }
+    }
+
+    @PostMapping("/{id}/likes")
+    public String toggleInitiativeLike(@PathVariable Long id,
+                                       @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            initiativeLikeService.toggleLike(id, currentUser);
+            return "redirect:/initiatives?liked";
+        } catch (Exception e) {
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/initiatives?error=" + errorMessage;
+        }
+    }
+
+    @PostMapping("/{initiativeId}/posts/{postId}/likes")
+    public String togglePostLike(@PathVariable Long initiativeId,
+                                 @PathVariable Long postId,
+                                 @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            likeService.toggleLike(postId, currentUser);
+            return "redirect:/initiatives/" + initiativeId + "?liked";
+        } catch (Exception e) {
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/initiatives/" + initiativeId + "?error=" + errorMessage;
         }
     }
 

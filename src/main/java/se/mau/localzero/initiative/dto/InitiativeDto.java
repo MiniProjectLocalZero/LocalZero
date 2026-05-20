@@ -20,6 +20,7 @@ public class InitiativeDto {
     private LocalDate endDate;
     private Category category;
     private Visibility visibility;
+    private boolean official;
 
     private String communityName;
 }

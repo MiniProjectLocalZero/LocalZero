@@ -2,6 +2,8 @@ package se.mau.localzero.auth.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import se.mau.localzero.CommunityRepository;
+import se.mau.localzero.exception.UserNotFoundException;
 import se.mau.localzero.domain.Community;
 import se.mau.localzero.domain.User;
 import se.mau.localzero.domain.UserRole;
@@ -9,6 +11,8 @@ import se.mau.localzero.auth.handler.RegistrationHandler;
 import se.mau.localzero.auth.handler.UserExistHandler;
 import se.mau.localzero.auth.handler.ValidationHandler;
 import se.mau.localzero.auth.repository.UserRepository;
+
+import java.util.Set;
 
 /**
  * Service for handling authentication business logic
@@ -18,10 +22,12 @@ import se.mau.localzero.auth.repository.UserRepository;
 public class AuthService {
     public final UserRepository userRepository;
     public final PasswordEncoder passwordEncoder;
+    public final CommunityRepository communityRepository;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, CommunityRepository communityRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.communityRepository = communityRepository;
     }
 
     /**
@@ -30,11 +36,11 @@ public class AuthService {
      * @param userCommunity User chosen Community
      * @param unhashedPass Plaintext password
      */
-    public void registerNewUser(String username, String email, String userCommunity, String unhashedPass) {
-        Community community = new Community(userCommunity);
+    public void registerNewUser(String username, String email, String userCommunity, String unhashedPass, Set<UserRole> roles) {
+        Community community = communityRepository.findFirstByName(userCommunity)
+                .orElseGet(() -> communityRepository.save(new Community(userCommunity)));
 
         User newUser = new User(username, email, community, unhashedPass);
-
         RegistrationHandler validation = new ValidationHandler();
         RegistrationHandler checkExist = new UserExistHandler(userRepository);
 
@@ -45,10 +51,34 @@ public class AuthService {
 
         if (validation.check(newUser)) {
             newUser.setPassword(passwordEncoder.encode(unhashedPass));
-
-            newUser.getRoles().add(UserRole.RESIDENT);
-
+            
+            if (roles == null || roles.isEmpty()) {
+                newUser.getRoles().add(UserRole.RESIDENT);
+            } else {
+                newUser.getRoles().addAll(roles);
+            }
+            
             userRepository.save(newUser);
         }
+    }
+
+    /**
+     * Get a user by ID.
+     *
+     * @param userId The user ID
+     * @return The User entity
+     * @throws RuntimeException if user not found
+     */
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    }
+
+    /**
+     * Get all users with the REPRESENTATIVE role.
+     * @return A list of all representatives
+     */
+    public java.util.List<User> getAllRepresentatives() {
+        return userRepository.findByRolesContaining(UserRole.REPRESENTATIVE);
     }
 }

@@ -1,49 +1,99 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Create Initiative</title>
+    <title>Community Feed - LocalZero</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
     <link rel="stylesheet" th:href="@{/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/messaging.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <script th:src="@{/js/initiative.js}" defer></script>
+    <style>
+        .official-badge {
+            color: #8DB392;
+            background: #f0f4f0;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid #8DB392;
+        }
+    </style>
 </head>
 <body>
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<div class="center-screen-wrapper">
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-    <div class="initiatives-container">
-        <div th:each="init : ${initiatives}" class="initiative-card">
-            <div class="card-content">
-                <span class="badge" th:text="${init.category}">Category</span>
-                <h3 th:text="${init.title}">Title</h3>
-                <p th:text="${init.description}">Description</p>
+<div class="initiatives-feed">
+    <div class="section-header" style="width: 100%; max-width: 700px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0; color: #333;">Community Initiatives</h2>
+        <a th:href="@{/initiatives/create}" class="btn-primary" style="text-decoration: none;">
+            <i class="fas fa-plus"></i> Create Initiative
+        </a>
+    </div>
+
+    <div th:each="init : ${initiatives}" class="initiative-card">
+        <span class="category-tag" th:text="${init.category.displayName}">Category</span>
+        <div class="card-header">
+            <div class="header-text">
+                <h4 th:text="${init.community.name}">Malmö Community</h4>
+                <p class="meta-info">
+                    <span th:text="${init.createdBy?.username}">Username</span> •
+                    <span th:text="${#temporals.format(init.createdAt, 'dd MMMM yyyy')}">14 April 2026</span>
+                </p>
             </div>
+        </div>
 
-            <div class="card-footer">
-                <div class="stats">
-                    <form th:action="@{/initiatives/{id}/likes(id=${init.id})}" method="post" class="like-form">
-                        <button type="submit" class="like-btn" th:classappend="${likedInitiativeIds != null && likedInitiativeIds.contains(init.id)} ? 'liked' : ''">
-                            <span th:text="${likedInitiativeIds != null && likedInitiativeIds.contains(init.id)} ? '👍 Liked' : '👍 Like'">👍 Like</span>
-                            <span class="like-count" th:text="${initiativeLikeCounts != null ? initiativeLikeCounts.get(init.id) : 0}">0</span>
+        <div class="card-body">
+            <h3 style="display: flex; align-items: center; gap: 10px;">
+                <span th:text="${init.title}">Title of the Initiative</span>
+                <span th:if="${init.official}" class="official-badge" title="Official Community Initiative">
+                    <i class="fas fa-check-circle"></i>
+                    <small>Official</small>
+                </span>
+            </h3>
+            <p th:text="${init.description}">Description...</p>
+        </div>
+
+        <div class="card-footer">
+            <div class="engagement">
+               <span class="metric like-container" th:data-id="${init.id}" onclick="toggleLike(this)">
+            <i th:class="${init.likes.contains(#authentication.principal.user) ? 'fas fa-thumbs-up heart-icon liked' : 'far fa-thumbs-up heart-icon'}"></i>
+            <span class="like-count" th:text="${init.likes.size()}">0</span> likes
+       </span>
+
+                <button th:class="${init.participants.contains(#authentication.principal.user) ? 'btn-join-action joined' : 'btn-join-action'}"
+                        th:data-id="${init.id}" onclick="toggleJoin(this)">
+                    <i th:class="${init.participants.contains(#authentication.principal.user) ? 'fas fa-check' : 'fas fa-plus'}"></i>
+                    <span th:text="${init.participants.contains(#authentication.principal.user) ? 'Joined' : 'Join initiative'}">Join initiative</span>
+                </button>
+
+                <div class="admin-actions" th:if="${init.createdBy?.username == #authentication.name or (#authorization.expression('hasRole(''REPRESENTATIVE'')') and init.community.id == #authentication.principal.communityId)}">
+                    <!-- Toggle Official (Only for Representatives) -->
+                    <form th:if="${#authorization.expression('hasRole(''REPRESENTATIVE'')') and init.community.id == #authentication.principal.communityId}"
+                          th:action="@{/initiatives/{id}/toggle-official(id=${init.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-admin-action official">
+                            <i th:class="${init.official ? 'fas fa-times-circle' : 'fas fa-check-circle'}"></i>
+                            <span th:text="${init.official ? 'Unmark Official' : 'Mark Official'}">Toggle Official</span>
                         </button>
                     </form>
-                    <span class="stat-item">
-                        <i class="fas fa-comment"></i> Updates
-                    </span>
-                </div>
 
-                <div class="actions">
-                    <form th:if="${currentUser != null and !#sets.contains(init.participants, currentUser)}"
-                          th:action="@{/initiatives/{id}/join(id=${init.id})}" method="post" style="display:inline;">
-                        <button type="submit" class="btn-join" title="Join Initiative">+</button>
+                    <form th:action="@{/initiatives/{id}/delete(id=${init.id})}" method="post"
+                          onsubmit="return confirm('Vill du verkligen ta bort detta initiativ?');" style="display: inline;">
+                        <button type="submit" class="btn-admin-action delete">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>Delete</span>
+                        </button>
                     </form>
-                    <form th:if="${currentUser != null and #sets.contains(init.participants, currentUser)}"
-                          th:action="@{/initiatives/{id}/leave(id=${init.id})}" method="post" style="display:inline;">
-                        <button type="submit" class="btn-join" title="Leave Initiative">−</button>
-                    </form>
-                    <a th:href="@{/initiatives/{id}(id=${init.id})}" class="btn-details">View</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 </body>
+</html>
