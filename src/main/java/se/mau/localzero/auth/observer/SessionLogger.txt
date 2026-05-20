@@ -1,5 +1,13 @@
 User has been logged in successfully: malmo - Date: 2026-05-02 Time: 11:21:02
 user has been logged out successfully: malmo - Date: 2026-05-02 Time: 11:21:08
+User has been logged in successfully: nini2 - Date: 2026-05-18 Time: 11:34:27
+User has been logged in successfully: nini2 - Date: 2026-05-18 Time: 11:37:21
+User has been logged in successfully: nini2 - Date: 2026-05-18 Time: 11:42:35
+User has been logged in successfully: nini2 - Date: 2026-05-18 Time: 11:46:12
+User has been logged in successfully: nini2 - Date: 2026-05-18 Time: 11:49:37
+User has been logged in successfully: nini2 - Date: 2026-05-18 Time: 12:04:43
+User has been logged in successfully: nini2 - Date: 2026-05-18 Time: 02:41:06
+User has been logged in successfully: nini2 - Date: 2026-05-18 Time: 03:23:43
 User has been logged in successfully: mjolk - Date: 2026-05-04 Time: 11:25:56
 user has been logged out successfully: mjolk - Date: 2026-05-04 Time: 11:26:36
 User has been logged in successfully: vatten - Date: 2026-05-04 Time: 11:26:41
@@ -38,3 +46,6 @@ User has been logged in successfully: Carl - Date: 2026-05-06 Time: 08:06:14
 user has been logged out successfully: Carl - Date: 2026-05-06 Time: 08:15:33
 User has been logged in successfully: Calle - Date: 2026-05-06 Time: 08:15:59
 User has been logged in successfully: Carl - Date: 2026-05-06 Time: 08:25:47
+User has been logged in successfully: pastil - Date: 2026-05-18 Time: 07:05:18
+User has been logged in successfully: pastil - Date: 2026-05-18 Time: 07:30:02
+User has been logged in successfully: pastil - Date: 2026-05-18 Time: 07:34:02

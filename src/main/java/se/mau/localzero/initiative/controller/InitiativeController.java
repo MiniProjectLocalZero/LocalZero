@@ -61,6 +61,7 @@ public class InitiativeController {
             return "redirect:/initiatives?success";
 
         } catch (Exception e) {
+            e.printStackTrace();
             String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
             return "redirect:/initiatives/create?error=" + e.getMessage();
         }
@@ -103,6 +104,7 @@ public class InitiativeController {
                     "message", "Visibility changed" + next
             ));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
         }
     }
@@ -180,7 +182,8 @@ public class InitiativeController {
                     "newLikeCount", initiative.getLikes().size(),
                     "isLiked", isLiked
             ));
-        } catch (Exception e) {
+        }catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "error", e.getMessage()));
         }

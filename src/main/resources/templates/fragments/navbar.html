@@ -7,6 +7,8 @@
     <link rel="stylesheet" th:href="@{/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/messaging.css}">
 
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <nav th:fragment="navbar" class="nav-wrapper">
@@ -45,15 +47,44 @@
             </svg>
         </button>
 
-        <a th:href="@{/notification/inbox}" class="icon-button notification-container">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                 class="lucide lucide-bell-icon lucide-bell">
-                <path d="M10.268 21a2 2 0 0 0 3.464 0"/>
-                <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>
-            </svg>
-            <span id="unread-badge" class="notification-badge" style="display: none;">0</span>
-        </a>
+        <div class="icon-button notification-container" style="position: relative;">
+            <a href="#" id="bell-icon" style="color: inherit; text-decoration: none; display: flex; align-items: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="lucide lucide-bell-icon lucide-bell">
+                    <path d="M10.268 21a2 2 0 0 0 3.464 0"/>
+                    <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>
+                </svg>
+
+                <span id="unread-badge" class="notification-badge"
+                      th:if="${unreadCount != null and unreadCount > 0}"
+                      th:text="${unreadCount}"></span>
+            </a>
+
+            <div id="notification-dropdown" class="notification-dropdown hidden">
+                <div class="dropdown-header">
+                    <h4>Notifications</h4>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <a href="#" id="mark-all-read" style="font-size: 12px; color: var(--dark-green-color); text-decoration: underline; cursor: pointer;">Mark all as read</a>
+
+                        <!-- <a th:href="@{/notification/inbox}" style="font-size: 12px; color: var(--dark-green-color); text-decoration: none; font-weight: bold;">See all</a> -->
+                    </div>
+                </div>
+                <div class="dropdown-body">
+
+                    <div th:each="notif : ${recentNotifications}"
+                         class="notification-item"
+                         th:classappend="${!notif.read} ? 'unread' : ''"> <p th:text="${notif.message}"></p>
+                        <span class="time" th:text="${#temporals.format(notif.createdAt, 'dd MMM HH:mm')}"></span>
+                    </div>
+
+                    <div th:if="${#lists.isEmpty(recentNotifications)}" class="notification-item">
+                        <p>No new notifications.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
 
         <form th:action="@{/logout}" method="post">
             <button id="logout-btn" type="submit">Log out</button>
