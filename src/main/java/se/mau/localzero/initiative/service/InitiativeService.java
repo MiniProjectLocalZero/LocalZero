@@ -52,6 +52,30 @@ public class InitiativeService {
         return initiativeRepository.findAll();
     }
 
+    public void joinInitiative(Long initiativeId, User user) {
+        Initiative initiative = initiativeRepository.findById(initiativeId)
+                .orElseThrow(() -> new RuntimeException("Initiative not found"));
+
+        if (initiative.getParticipants().contains(user)) {
+            throw new RuntimeException("You are already a participant in this initiative");
+        }
+
+        initiative.addParticipant(user);
+        initiativeRepository.save(initiative);
+    }
+
+    public void leaveInitiative(Long initiativeId, User user) {
+        Initiative initiative = initiativeRepository.findById(initiativeId)
+                .orElseThrow(() -> new RuntimeException("Initiative not found"));
+
+        if (!initiative.getParticipants().contains(user)) {
+            throw new RuntimeException("You are not a participant in this initiative");
+        }
+
+        initiative.removeParticipant(user);
+        initiativeRepository.save(initiative);
+    }
+
     public void deleteInitiative(Long id, User currentUser) {
         Initiative initiative = initiativeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Initiative not found"));
