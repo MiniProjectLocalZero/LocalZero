@@ -28,13 +28,23 @@ LocalZero is built as part of the **Tillämpad Programvaruarkitektur** (Applied 
 *   **Representatives (Administrators):** Enjoy all Resident capabilities, plus the ability to create **Official Initiatives** and view a dedicated dashboard showing aggregated community-wide carbon savings.
 
 ### 🍃 Sustainability Impact Tracking
-*   Users log green actions across categorized areas:
+*   Users log green actions across 15 distinct, localized categories with mock CO₂ savings:
+    *   `ENERGY_SAVING` (8.0kg CO₂ savings)
+    *   `ZERO_WASTE` (6.0kg CO₂ savings)
     *   `RIDE_SHARING` (5.0kg CO₂ savings)
+    *   `CLOTHES_SWAP` (4.0kg CO₂ savings)
+    *   `REPAIR_CAFE` (3.5kg CO₂ savings)
     *   `TOOL_SHARING` (2.5kg CO₂ savings)
+    *   `COMPOSTING` (2.2kg CO₂ savings)
+    *   `URBAN_FARMING` (2.0kg CO₂ savings)
+    *   `WATER_CONSERVATION` (1.8kg CO₂ savings)
+    *   `SKILL_SHARING` (1.5kg CO₂ savings)
     *   `FOOD_SWAP` (1.2kg CO₂ savings)
+    *   `LOCAL_CLEANUP` (1.0kg CO₂ savings)
+    *   `WILDLIFE_PROTECTION` (1.0kg CO₂ savings)
     *   `GARDENING` (0.8kg CO₂ savings)
     *   `RECYCLING` (0.5kg CO₂ savings)
-*   Dynamic calculation of personal impact alongside community totals.
+*   Dynamic calculation of personal impact alongside community totals using the Strategy Pattern.
 
 ### 💬 Decoupled Social Engine
 *   **Messaging System:** Send private text messages, delete messages, or broadcast messages to all members of a community.

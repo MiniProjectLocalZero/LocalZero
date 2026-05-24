@@ -48,7 +48,7 @@ public class SustainabilityActionService {
 
         switch (category) {
             case RIDE_SHARING:
-                return 5;
+                return 5.0;
             case TOOL_SHARING:
                 return 2.5;
             case RECYCLING:
@@ -57,6 +57,26 @@ public class SustainabilityActionService {
                 return 1.2;
             case GARDENING:
                 return 0.8;
+            case ENERGY_SAVING:
+                return 8.0;
+            case LOCAL_CLEANUP:
+                return 1.0;
+            case SKILL_SHARING:
+                return 1.5;
+            case URBAN_FARMING:
+                return 2.0;
+            case CLOTHES_SWAP:
+                return 4.0;
+            case REPAIR_CAFE:
+                return 3.5;
+            case COMPOSTING:
+                return 2.2;
+            case WATER_CONSERVATION:
+                return 1.8;
+            case WILDLIFE_PROTECTION:
+                return 1.0;
+            case ZERO_WASTE:
+                return 6.0;
             default:
                 return 0.0;
         }
