@@ -19,7 +19,7 @@ public class PublicInitiativeCreator implements InitiativeCreator {
 
     @Override
     public Initiative create(InitiativeDto dto, User creator, Community community) {
-        return new Initiative(
+        Initiative initiative = new Initiative(
                 dto.getTitle(),
                 dto.getDescription(),
                 dto.getStartDate(),
@@ -29,6 +29,11 @@ public class PublicInitiativeCreator implements InitiativeCreator {
                 creator,
                 community
         );
+
+        boolean isOfficial = dto.isOfficial() && creator.getRoles().contains(se.mau.localzero.domain.UserRole.REPRESENTATIVE);
+        initiative.setOfficial(isOfficial);
+
+        return initiative;
     }
 }
 

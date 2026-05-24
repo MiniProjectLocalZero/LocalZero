@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LocalZero - Home Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/navbar.css}">
     <link rel="stylesheet" th:href="@{/styles.css}">
     <link rel="stylesheet" th:href="@{/css/messaging.css}">
@@ -26,7 +27,7 @@
             <a th:href="@{/initiatives/create}" class="btn-primary">Create Initiative</a>
             <a th:href="@{/initiatives}" class="btn-secondary">Browse Initiatives</a>
             <a th:href="@{/messages/inbox}" class="btn-secondary">View Messages</a>
-            <a th:href="@{/sustainability/log}" class="btn-secondary">Log Action</a>
+            <a th:href="@{/actions/log}" class="btn-secondary">Log Action</a>
         </div>
 
         <div class="dashboard-layout">
@@ -37,16 +38,38 @@
                 </div>
 
                 <div class="initiative-preview-list">
-                    <div th:each="initiative : ${recentInitiatives}" class="mini-initiative-card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div>
-                                <span class="category-tag" th:text="${initiative.category}">CATEGORY</span>
-                                <h4 th:text="${initiative.title}" style="margin-top: 10px;">Initiative Title</h4>
-                                <p th:text="${#strings.abbreviate(initiative.description, 100)}" style="font-size: 0.9rem; color: #555; margin: 10px 0;">Description...</p>
+                    <div th:each="initiative : ${recentInitiatives}" 
+                         class="mini-initiative-card" 
+                         th:onclick="|window.location.href='@{/initiatives}'|">
+                        
+                        <span class="category-tag" th:text="${initiative.category.displayName}">CATEGORY</span>
+                        <h4 th:text="${initiative.title}" style="margin-top: 10px;">Initiative Title</h4>
+                        <p th:text="${#strings.abbreviate(initiative.description, 80)}" style="font-size: 0.9rem; color: #555; margin: 10px 0;">Description...</p>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto;">
+                            <div class="stats" style="display: flex; gap: 15px;">
+                                <div class="metric" style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #666;">
+                                    <i class="fas fa-users" style="color: #8DB392;"></i>
+                                    <span th:text="${initiative.participants.size()} + ' participants'">0 participants</span>
+                                </div>
+                                <div class="metric" style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #666;">
+                                    <i class="fas fa-heart" style="color: #e74c3c;"></i>
+                                    <span th:text="${initiative.likes.size()} + ' likes'">0 likes</span>
+                                </div>
                             </div>
-                            <div class="stats" style="flex-direction: column; align-items: flex-end; gap: 5px;">
-                                <div class="metric"><span th:text="${initiative.participants.size()}">0</span> participants</div>
-                                <div class="metric"><span th:text="${initiative.likes.size()}">0</span> likes</div>
+
+                            <!-- Admin Action (Delete) - Click propagation stopped to prevent redirection -->
+                            <div class="admin-actions" 
+                                 th:if="${initiative.createdBy?.username == #authentication.name or (#authorization.expression('hasRole(''REPRESENTATIVE'')') and initiative.community.id == #authentication.principal.communityId)}"
+                                 onclick="event.stopPropagation();">
+                                <form th:action="@{/initiatives/{id}/delete(id=${initiative.id})}" method="post"
+                                      onsubmit="return confirm('Vill du verkligen ta bort detta initiativ?');" 
+                                      style="margin: 0;">
+                                    <button type="submit" class="btn-admin-action delete" style="height: 30px; padding: 0 12px; font-size: 11px; min-width: auto;">
+                                        <i class="fas fa-trash-alt"></i>
+                                        <span>Delete</span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -68,14 +91,23 @@
                         <span class="stat-value" th:text="${totalActions}">0</span>
                         <span class="stat-label">Sustainable Actions</span>
                     </div>
-                    <a th:href="@{/sustainability/log}" class="btn-primary" style="display: block; text-align: center; margin-top: 10px; font-size: 0.9rem;">Log New Action</a>
+                    <a th:href="@{/actions/log}" class="btn-primary" style="display: block; text-align: center; margin-top: 10px; font-size: 0.9rem;">Log New Action</a>
+                </div>
+
+                <div class="impact-card" th:if="${isRepresentative}" style="margin-top: 20px; border-color: var(--dark-green-color);">
+                    <h3>Community Impact</h3>
+                    <div class="impact-stat">
+                        <span class="stat-value" style="color: var(--dark-green-color);"><span th:text="${#numbers.formatDecimal(communityCarbonSaving, 1, 1)}">0.0</span> kg</span>
+                        <span class="stat-label">Total CO2 Saved</span>
+                    </div>
+                    <p style="font-size: 0.8rem; color: #666; margin-top: 10px;">Showing cumulative impact for all members of <span th:text="${communityName}">Community</span>.</p>
                 </div>
             </aside>
         </div>
     </div>
 
     <!-- UNAUTHENTICATED VIEW -->
-    <div sec:authorize="!isAuthenticated()">
+    <div sec:authorize="!isAuthenticated()" class="guest-landing">
         <section class="hero-section">
             <h1>LocalZero</h1>
             <h2>Collaborative Sustainability for Your Neighborhood</h2>

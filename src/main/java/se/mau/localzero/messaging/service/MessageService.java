@@ -92,6 +92,25 @@ public class MessageService {
     }
 
     /**
+     * Broadcast a message to all community members.
+     * @param sender The user sending the broadcast
+     * @param content The message content
+     */
+    @Transactional(readOnly = false)
+    public void broadcastMessage(User sender, String content) {
+        mediator.broadcastMessage(sender, sender.getCommunity(), content);
+    }
+
+    /**
+     * Get the message repository.
+     * Used by controllers for creating commands directly if needed.
+     * @return The MessageRepository
+     */
+    public MessageRepository getMessageRepository() {
+        return messageRepository;
+    }
+
+    /**
      * Get the inbox for a user.
      * @param currentUser The user to get the inbox for
      * @return A list of messages sent to the user, sorted by creation date (newest first)

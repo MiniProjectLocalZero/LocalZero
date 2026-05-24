@@ -2,6 +2,9 @@ package se.mau.localzero.auth.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import se.mau.localzero.domain.UserRole;
+
+import java.util.Set;
 
 /**
  * Data Transfer Object (DTO) for user registration.
@@ -16,4 +19,5 @@ public class UserRegistrationDto {
     private String email;
     private String community;
     private String password;
+    private Set<UserRole> roles;
 }

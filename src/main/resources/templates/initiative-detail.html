@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${initiative.title}">Initiative Detail</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/navbar.css}">
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/messaging.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="homepage-container">
+    <div class="dashboard-layout">
+        <main>
+            <div class="initiative-header-section" style="margin-bottom: 30px;">
+                <h1 th:text="${initiative.title}" style="color: var(--dark-green-color); margin-bottom: 10px;">Title</h1>
+                <p th:text="${initiative.description}" style="font-size: 1.1rem; line-height: 1.6; color: #444;">Description</p>
+            </div>
+
+            <div th:if="${param.error}" class="error-container">
+                <p th:text="${param.error}">An error occurred.</p>
+            </div>
+            <div th:if="${param.posted}" class="success-message" style="background: #e8f5e9; color: #2e7d32; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin:0;"><i class="fas fa-check-circle"></i> Update posted successfully!</p>
+            </div>
+
+            <!-- Owner: Post an Update -->
+            <div class="impact-card" th:if="${currentUser != null and initiative.createdBy == currentUser}" style="margin-bottom: 30px;">
+                <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Post an Update</h3>
+                <form th:action="@{/initiatives/{id}/posts(id=${initiative.id})}" th:object="${postDto}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="content">Message</label>
+                        <textarea id="content" th:field="*{content}" placeholder="Share an update with participants..." required maxlength="5000"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Image (optional)</label>
+                        <input type="file" id="image" th:field="*{image}" accept="image/*" style="padding: 8px 0;">
+                    </div>
+                    <button type="submit" class="btn-primary" style="border:none; cursor:pointer; width: auto;">
+                        <i class="fas fa-paper-plane"></i> Post Update
+                    </button>
+                </form>
+            </div>
+
+            <!-- Non-owner: Add a Comment on the initiative -->
+            <div class="impact-card" th:if="${currentUser != null and initiative.createdBy != currentUser}" style="margin-bottom: 30px;">
+                <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Add a Comment</h3>
+                <form th:action="@{/initiatives/{id}/comments(id=${initiative.id})}" method="post">
+                    <div class="form-group">
+                        <textarea name="content" placeholder="Write a comment about this initiative..." required maxlength="3000"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" style="border:none; cursor:pointer; width: auto;">
+                        <i class="fas fa-comment"></i> Comment
+                    </button>
+                </form>
+            </div>
+
+            <!-- Updates feed -->
+            <div class="posts-feed">
+                <div class="section-title">
+                    <span>Updates</span>
+                </div>
+                
+                <div th:if="${#lists.isEmpty(posts)}" class="empty-state">
+                    <p>No updates yet.</p>
+                </div>
+
+                <div th:each="post : ${posts}" class="initiative-card" style="max-width: none; margin-bottom: 25px;">
+                    <div class="card-header">
+                        <div class="header-text">
+                            <h4 th:text="${post.author.username}">Author</h4>
+                            <p class="meta-info" th:text="${#temporals.format(post.createdAt, 'dd MMMM yyyy HH:mm')}">Date</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p th:text="${post.content}" style="white-space: pre-wrap; margin-bottom: 15px;">Content</p>
+                        <img th:if="${post.imageData != null}" th:src="@{/posts/{id}/image(id=${post.id})}" 
+                             class="post-image" alt="Post image" style="max-width: 100%; border-radius: 8px; margin-bottom: 15px;">
+                    </div>
+
+                    <div class="card-footer" style="flex-direction: column; align-items: flex-start;">
+                        <div class="engagement">
+                            <form th:action="@{/initiatives/{iid}/posts/{pid}/likes(iid=${initiative.id},pid=${post.id})}" method="post" class="like-form">
+                                <button type="submit" class="like-btn" th:classappend="${likedPostIds != null && likedPostIds.contains(post.id)} ? 'liked' : ''">
+                                    <i th:class="${likedPostIds != null && likedPostIds.contains(post.id)} ? 'fas fa-thumbs-up' : 'far fa-thumbs-up'"></i>
+                                    <span class="like-count" th:text="${#sets.size(post.likes)}">0</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="comments-section" style="width: 100%; margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 8px;">
+                            <h4 style="font-size: 0.95rem; margin-bottom: 15px; color: #555;">
+                                <i class="fas fa-comments"></i> Comments (<span th:text="${#sets.size(post.comments)}">0</span>)
+                            </h4>
+                            
+                            <div th:each="comment : ${post.comments}" class="comment-item" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                                <div class="comment-meta" style="font-size: 0.85rem; display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <strong th:text="${comment.author.username}" style="color: var(--dark-green-color);">Author</strong>
+                                    <span th:text="${#temporals.format(comment.createdAt, 'dd MMM HH:mm')}" style="color: #888;">Date</span>
+                                </div>
+                                <p th:text="${comment.content}" style="font-size: 0.95rem; margin-bottom: 8px;">Content</p>
+                                <form th:action="@{/initiatives/{iid}/posts/{pid}/comments/{cid}/likes(iid=${initiative.id},pid=${post.id},cid=${comment.id})}" method="post" class="like-form">
+                                    <button type="submit" class="like-btn small" th:classappend="${likedCommentIds != null && likedCommentIds.contains(comment.id)} ? 'liked' : ''">
+                                        <i th:class="${likedCommentIds != null && likedCommentIds.contains(comment.id)} ? 'fas fa-thumbs-up' : 'far fa-thumbs-up'"></i>
+                                        <span class="like-count" th:text="${commentLikeCounts != null ? commentLikeCounts.get(comment.id) : 0}">0</span>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <form th:if="${currentUser != null}" th:action="@{/initiatives/{iid}/posts/{pid}/comments(iid=${initiative.id},pid=${post.id})}" method="post" style="margin-top: 15px;">
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    <textarea name="content" placeholder="Add a comment..." required maxlength="3000" style="min-height: 60px; font-size: 0.9rem; padding: 10px;"></textarea>
+                                </div>
+                                <button type="submit" class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem; border:none; cursor:pointer; width: auto;">Reply</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Initiative Comments (visible to everyone) -->
+            <div class="initiative-comments-feed" th:if="${!#lists.isEmpty(initiativeComments)}">
+                <div class="section-title" style="margin-top: 40px;">
+                    <span>General Comments</span>
+                </div>
+                <div th:each="comment : ${initiativeComments}" class="impact-card" style="margin-bottom: 15px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <strong th:text="${comment.author.username}" style="color: var(--dark-green-color);">Author</strong>
+                        <span th:text="${#temporals.format(comment.createdAt, 'dd MMMM yyyy HH:mm')}" style="font-size: 0.85rem; color: #888;">Date</span>
+                    </div>
+                    <p th:text="${comment.content}" style="margin: 0; line-height: 1.5;">Content</p>
+                </div>
+            </div>
+        </main>
+
+        <aside>
+            <div class="impact-card">
+                <div class="category-tag" th:text="${initiative.category}" style="margin-bottom: 15px;">Category</div>
+                
+                <div class="impact-stat" style="margin-top: 10px;">
+                    <span class="stat-label">Created By</span>
+                    <span class="stat-value" style="font-size: 1.2rem;" th:text="${initiative.createdBy.username}">User</span>
+                </div>
+
+                <div class="initiative-details-list" style="margin: 20px 0; border-top: 1px solid #eee; padding-top: 15px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #666; font-size: 0.95rem;">
+                        <i class="far fa-calendar-alt" style="width: 18px; color: var(--light-green-color);"></i>
+                        <span>Starts: <strong th:text="${initiative.startDate}">Start</strong></span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #666; font-size: 0.95rem;">
+                        <i class="fas fa-calendar-check" style="width: 18px; color: var(--light-green-color);"></i>
+                        <span>Ends: <strong th:text="${initiative.endDate}">End</strong></span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #666; font-size: 0.95rem;">
+                        <i class="fas fa-eye" style="width: 18px; color: var(--light-green-color);"></i>
+                        <span th:text="${initiative.visibility}">Visibility</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #666; font-size: 0.95rem;">
+                        <i class="fas fa-users" style="width: 18px; color: var(--light-green-color);"></i>
+                        <span th:text="${#sets.size(initiative.participants)} + ' participants'">0 participants</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-actions" style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
+                    <!-- Join/Leave Form -->
+                    <form th:if="${currentUser != null and !#sets.contains(initiative.participants, currentUser) and initiative.createdBy != currentUser}"
+                          th:action="@{/initiatives/{id}/join(id=${initiative.id})}" method="post" style="width: 100%;">
+                        <button type="submit" class="btn-join-action" style="width: 100%; height: 45px;">
+                            <i class="fas fa-plus"></i> Join Initiative
+                        </button>
+                    </form>
+                    <form th:if="${currentUser != null and #sets.contains(initiative.participants, currentUser)}"
+                          th:action="@{/initiatives/{id}/leave(id=${initiative.id})}" method="post" style="width: 100%;">
+                        <button type="submit" class="btn-join-action joined" style="width: 100%; height: 45px;">
+                            <i class="fas fa-check"></i> <span>Joined</span>
+                        </button>
+                    </form>
+
+                    <!-- Like Form -->
+                    <form th:action="@{/initiatives/{id}/likes(id=${initiative.id})}" method="post" class="like-form" style="width: 100%;">
+                        <button type="submit" class="btn-secondary" th:classappend="${userLikedInitiative != null && userLikedInitiative} ? 'liked' : ''" 
+                                style="width: 100%; height: 45px; display: flex; justify-content: center; align-items: center; gap: 10px; cursor: pointer; border-radius: 20px;">
+                            <i th:class="${userLikedInitiative != null && userLikedInitiative} ? 'fas fa-thumbs-up' : 'far fa-thumbs-up'"></i>
+                            <span th:text="${userLikedInitiative != null && userLikedInitiative} ? 'Liked' : 'Like'">Like</span>
+                            <span class="like-count" th:text="${initiativeLikeCount}">0</span>
+                        </button>
+                    </form>
+
+                    <a th:href="@{/initiatives}" class="btn-secondary" style="width: 100%; height: 45px; display: flex; justify-content: center; align-items: center; text-decoration: none; border-radius: 20px; box-sizing: border-box;">
+                        <i class="fas fa-arrow-left"></i> Back to Feed
+                    </a>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+</body>
+</html>

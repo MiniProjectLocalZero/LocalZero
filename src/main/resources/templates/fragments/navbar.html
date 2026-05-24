@@ -7,57 +7,75 @@
     <link rel="stylesheet" th:href="@{/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/messaging.css}">
 
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
-<nav th:fragment="navbar" class="nav-wrapper">
-    <div>
-        <h2>LocalZero</h2>
+<nav th:fragment="navbar" class="nav-container" sec:authorize="isAuthenticated()">
+    <div class="nav-brand">
+        <a th:href="@{/}" class="brand-logo">LocalZero</a>
+        <button class="mobile-toggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
     </div>
 
-    <div class="logged-in-as" sec:authorize="isAuthenticated()">
-        <span id="logged-in-span"><strong sec:authentication="name"></strong></span>
+    <div class="nav-content" id="navContent">
+        <!-- Center Section: Primary Navigation (Always visible or in hamburger) -->
+        <div class="nav-links">
+            <a th:href="@{/}" class="nav-link">
+                <i class="fas fa-home"></i> <span>Home</span>
+            </a>
+            <a th:href="@{/initiatives}" class="nav-link">
+                <i class="fas fa-bullhorn"></i> <span>Initiatives</span>
+            </a>
+        </div>
 
-        <a th:href="@{/profile}" class="icon-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                 class="lucide lucide-user-icon lucide-user">
-                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-            </svg>
-        </a>
+        <!-- Right Section: User Actions & Auth -->
+        <div class="nav-actions" sec:authorize="isAuthenticated()">
+            <div class="user-greeting">
+                Logged in as: <strong sec:authentication="name">User</strong>
+            </div>
 
+            <div class="action-icons">
+                <button type="button" class="icon-btn messaging-trigger" onclick="openMessagingModal()" title="Messages">
+                    <span id="message-badge" class="badge message-badge" style="display: none;">0</span>
+                    <i class="fas fa-comment-dots"></i>
+                </button>
 
-        <a th:href="@{/}" class="icon-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                 class="lucide lucide-house-icon lucide-house">
-                <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/>
-                <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            </svg>
-        </a>
+                <div class="notification-wrapper">
+                    <button class="icon-btn" id="bell-icon" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span id="unread-badge" class="badge" th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}"></span>
+                    </button>
+                    
+                    <div id="notification-dropdown" class="notification-dropdown hidden">
+                        <div class="dropdown-header">
+                            <h4>Notifications</h4>
+                            <a href="#" id="mark-all-read">Mark all as read</a>
+                        </div>
+                        <div class="dropdown-body">
+                            <div th:each="notif : ${recentNotifications}" class="notification-item" th:classappend="${!notif.read} ? 'unread' : ''">
+                                <p th:text="${notif.message}"></p>
+                                <span class="time" th:text="${#temporals.format(notif.createdAt, 'dd MMM HH:mm')}"></span>
+                            </div>
+                            <div th:if="${#lists.isEmpty(recentNotifications)}" class="notification-item">
+                                <p>No new notifications.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <button type="button" id="messageButton" class="icon-button messaging-trigger" onclick="openMessagingModal()">
-            <span id="message-badge" class="notification-badge message-badge" style="display: none;">0</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                 class="lucide lucide-message-circle-icon lucide-message-circle">
-                <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/>
-            </svg>
-        </button>
+                <a th:href="@{/profile}" class="icon-btn" title="My Profile">
+                    <i class="fas fa-user-circle"></i>
+                </a>
+            </div>
 
-        <a th:href="@{/notification/inbox}" class="icon-button notification-container">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                 class="lucide lucide-bell-icon lucide-bell">
-                <path d="M10.268 21a2 2 0 0 0 3.464 0"/>
-                <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>
-            </svg>
-            <span id="unread-badge" class="notification-badge" style="display: none;">0</span>
-        </a>
-
-        <form th:action="@{/logout}" method="post">
-            <button id="logout-btn" type="submit">Log out</button>
-        </form>
+            <form th:action="@{/logout}" method="post" class="logout-form">
+                <button type="submit" class="logout-btn">Log out</button>
+            </form>
+        </div>
     </div>
 
     <div id="messagingModal" class="messaging-modal-overlay" aria-hidden="true">
@@ -66,7 +84,14 @@
 
     <script th:src="@{/js/notification.js}" defer></script>
     <script th:src="@{/js/messaging.js}" defer></script>
-
+    <script>
+        function toggleMobileMenu() {
+            const navContent = document.getElementById('navContent');
+            navContent.classList.toggle('active');
+            const toggle = document.querySelector('.mobile-toggle');
+            toggle.classList.toggle('active');
+        }
+    </script>
 </nav>
 
 </body>

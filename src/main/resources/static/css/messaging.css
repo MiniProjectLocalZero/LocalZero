@@ -352,6 +352,7 @@
     align-items: center;
     justify-content: center;
     background: #f4f7f0;
+    padding: 40px;
 }
 
 .messaging-empty-card,
@@ -359,13 +360,16 @@
     text-align: center;
     color: #7a8570;
     max-width: 400px;
-    padding: 20px;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .messaging-empty-title,
 .empty-title {
-    margin: 0 0 10px;
-    font-size: 20px;
+    margin: 0 0 12px;
+    font-size: 22px;
     font-weight: 300;
     color: #546b41;
 }
@@ -583,12 +587,36 @@
     background: white;
     border: 1px solid rgba(84, 107, 65, 0.16);
     border-radius: 12px;
-    width: min(400px, 100%);
-    max-height: 75vh;
+    width: min(500px, 100%);
+    max-height: 85vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     box-shadow: 0 16px 40px rgba(30, 42, 22, 0.2);
+}
+
+#broadcastModal .user-picker-content {
+    width: min(650px, 100%);
+}
+
+.broadcast-textarea {
+    width: 100%;
+    min-height: 180px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.broadcast-textarea:focus {
+    outline: none;
+    border-color: var(--dark-green-color);
+    box-shadow: 0 0 0 3px rgba(84, 107, 65, 0.1);
 }
 
 .user-picker-header {
@@ -668,6 +696,19 @@
     font-weight: 500;
     color: #24301d;
     font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.rep-badge-inline {
+    font-size: 11px;
+    font-weight: 400;
+    color: #546b41;
+    background: rgba(84, 107, 65, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
 }
 
 .user-picker-item-community {
@@ -680,4 +721,26 @@
     text-align: center;
     padding: 40px 20px;
     color: #7a8570;
+}
+
+.empty-conversations {
+    padding: 40px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-conversations .empty-title {
+    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.empty-conversations p {
+    font-size: 14px;
+    color: #7a8570;
+    max-width: 250px;
+    margin: 0 auto;
 }

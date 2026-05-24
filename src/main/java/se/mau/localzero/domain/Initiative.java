@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +19,9 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@Component
+@Service
+@Repository
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = {"createdBy", "community", "participants", "posts"})
@@ -47,6 +53,9 @@ public class Initiative {
     @Column(nullable = false)
     private Visibility visibility;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isOfficial = false;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -68,11 +77,10 @@ public class Initiative {
 
     @ManyToMany
     @JoinTable(
-            name = "initiative_likes",
+            name = "initiative_user_likes",
             joinColumns = @JoinColumn(name = "initiative_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-
     private Set<User> likes = new HashSet<>();
 
     @OneToMany(mappedBy = "initiative", fetch = FetchType.LAZY)

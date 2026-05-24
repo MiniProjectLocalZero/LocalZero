@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import se.mau.localzero.auth.model.LocalZeroUserDetails;
 import se.mau.localzero.auth.repository.UserRepository;
 import se.mau.localzero.domain.Initiative;
-import se.mau.localzero.domain.SustainabilityAction;
 import se.mau.localzero.domain.User;
+import se.mau.localzero.domain.UserRole;
 import se.mau.localzero.initiative.repository.InitiativeRepository;
-import se.mau.localzero.sustainability.repository.SustainabilityActionRepository;
+import se.mau.localzero.sustainability.service.SustainabilityActionService;
 
 import java.util.List;
 
@@ -19,14 +19,14 @@ import java.util.List;
 public class HomeController {
 
     private final InitiativeRepository initiativeRepository;
-    private final SustainabilityActionRepository sustainabilityActionRepository;
+    private final SustainabilityActionService sustainabilityActionService;
     private final UserRepository userRepository;
 
     public HomeController(InitiativeRepository initiativeRepository, 
-                          SustainabilityActionRepository sustainabilityActionRepository,
+                          SustainabilityActionService sustainabilityActionService,
                           UserRepository userRepository) {
         this.initiativeRepository = initiativeRepository;
-        this.sustainabilityActionRepository = sustainabilityActionRepository;
+        this.sustainabilityActionService = sustainabilityActionService;
         this.userRepository = userRepository;
     }
 
@@ -49,14 +49,18 @@ public class HomeController {
             }
             model.addAttribute("recentInitiatives", recentInitiatives);
 
-            // Fetch sustainability impact summary
-            List<SustainabilityAction> userActions = sustainabilityActionRepository.findByUser(user);
-            double totalCarbonSaving = userActions.stream()
-                    .mapToDouble(SustainabilityAction::getCarbonSaving)
-                    .sum();
-            
+            // Fetch sustainability impact summary using Strategy Pattern via Service
+            double totalCarbonSaving = sustainabilityActionService.getPersonalImpact(user);
             model.addAttribute("totalCarbonSaving", totalCarbonSaving);
-            model.addAttribute("totalActions", userActions.size());
+            model.addAttribute("totalActions", user.getSustainabilityActions().size());
+
+            // Check if user is a REPRESENTATIVE to show community impact
+            boolean isRepresentative = user.getRoles().contains(UserRole.REPRESENTATIVE);
+            model.addAttribute("isRepresentative", isRepresentative);
+            if (isRepresentative) {
+                double communityCarbonSaving = sustainabilityActionService.getCommunityImpact(user);
+                model.addAttribute("communityCarbonSaving", communityCarbonSaving);
+            }
         }
         return "index";
     }

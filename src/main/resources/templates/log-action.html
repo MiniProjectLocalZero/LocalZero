@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>LocalZero - Log eco-action</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/styles.css}">
     <link rel="stylesheet" th:href="@{/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/messaging.css}">
@@ -12,33 +13,35 @@
 
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-<div class="container">
-    <h2>Log an eco-action</h2>
-    <p>What have you done today to save CO2? Write it down below!</p>
+<div class="initiative-form-container">
+    <h1>Log an eco-action</h1>
+    <p class="description-text">What have you done today to save CO2? Write it down below to track your impact!</p>
 
     <form th:action="@{/actions/log}" th:object="${sustainabilityActionDto}" method="post">
 
         <div class="form-group">
-            <label for="title">Title</label>
-            <input type="text" id="title" th:field="*{title}" required />
+            <label for="title">Action Title</label>
+            <input type="text" id="title" th:field="*{title}" placeholder="e.g., Cycled to work" required />
         </div>
 
         <div class="form-group">
             <label for="description">Description</label>
-            <textarea id="description" th:field="*{description}" rows="3"></textarea>
+            <textarea id="description" th:field="*{description}" rows="3" placeholder="Tell us more about what you did..."></textarea>
         </div>
 
         <div class="form-group">
-            <label for="category">Pick category</label>
+            <label for="category">Category</label>
             <select id="category" th:field="*{category}">
                 <option th:each="cat : ${categories}"
                         th:value="${cat}"
-                        th:text="${cat}">Category</option>
+                        th:text="${cat.displayName}">Category</option>
             </select>
         </div>
 
-        <button type="submit" class="btn btn-primary">Save action</button>
+        <button type="submit" class="btn-submit">Save Action</button>
     </form>
+    
+    <a th:href="@{/}" class="footer-link">← Back to Dashboard</a>
 </div>
 
 </body>

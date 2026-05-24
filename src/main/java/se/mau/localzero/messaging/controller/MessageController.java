@@ -1,5 +1,7 @@
 package se.mau.localzero.messaging.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,11 +10,15 @@ import se.mau.localzero.auth.model.LocalZeroUserDetails;
 import se.mau.localzero.auth.service.AuthService;
 import se.mau.localzero.domain.Community;
 import se.mau.localzero.domain.User;
+import se.mau.localzero.domain.UserRole;
 import se.mau.localzero.messaging.dto.SendMessageRequest;
 import se.mau.localzero.messaging.dto.UserSummaryDTO;
 import se.mau.localzero.messaging.service.MessageService;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Controller for handling message-related HTTP requests.
@@ -128,24 +134,30 @@ public class MessageController {
      * @return HTTP 200 OK on success
      */
     @PostMapping("/{messageId}/unread")
-    public org.springframework.http.ResponseEntity<Void> markAsUnread(@AuthenticationPrincipal LocalZeroUserDetails userDetails,
+    public ResponseEntity<Void> markAsUnread(@AuthenticationPrincipal LocalZeroUserDetails userDetails,
                              @PathVariable Long messageId) {
         User currentUser = getManagedUser(userDetails);
         messageService.markMessageAsUnread(messageId, currentUser);
-        return org.springframework.http.ResponseEntity.ok().build();
+        return ResponseEntity.ok().build();
     }
 
     private void populateInboxModel(Model model, User currentUser) {
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("conversations", messageService.getRecentConversations(currentUser));
         model.addAttribute("unreadCount", messageService.getUnreadCount(currentUser));
+        model.addAttribute("isRepresentative", currentUser.getRoles().contains(UserRole.REPRESENTATIVE));
     }
 
     private void populateConversationModel(Model model, User currentUser, User otherUser) {
         populateInboxModel(model, currentUser);
-        model.addAttribute("messages", messageService.getConversation(currentUser, otherUser));
+        List<se.mau.localzero.domain.Message> messages = messageService.getConversation(currentUser, otherUser);
+        model.addAttribute("messages", messages);
         model.addAttribute("otherUser", otherUser);
         model.addAttribute("activeConversationUserId", otherUser.getId());
+        
+        // Check if conversation should be read-only (e.g. contains broadcast messages)
+        boolean hasBroadcast = messages.stream().anyMatch(se.mau.localzero.domain.Message::isBroadcast);
+        model.addAttribute("isReadOnly", hasBroadcast);
     }
 
     private boolean isFragment(String fragment, String expected) {
@@ -165,10 +177,10 @@ public class MessageController {
 
     /**
      * Get list of all users in the current user's community (excluding self).
-     * Used by the new conversation picker modal.
+     * If the user is a REPRESENTATIVE, also include all other REPRESENTATIVEs from other communities.
      *
      * @param userDetails The currently authenticated user
-     * @return JSON list of community members as UserSummaryDTOs
+     * @return JSON list of users as UserSummaryDTOs
      */
     @GetMapping("/community-users")
     @ResponseBody
@@ -176,13 +188,62 @@ public class MessageController {
         User managedUser = getManagedUser(userDetails);
         Community community = managedUser.getCommunity();
 
-        if (community == null) {
-            return List.of();
+        Set<UserSummaryDTO> userSummaries = new HashSet<>();
+
+        // Add users from the same community
+        if (community != null) {
+            community.getMembers().stream()
+                    .filter(u -> !u.getId().equals(managedUser.getId()))
+                    .forEach(u -> userSummaries.add(new UserSummaryDTO(
+                            u.getId(), 
+                            u.getUsername(), 
+                            community.getName(),
+                            u.getRoles().contains(UserRole.REPRESENTATIVE)
+                    )));
         }
 
-        return community.getMembers().stream()
-                .filter(u -> !u.getId().equals(managedUser.getId()))
-                .map(u -> new UserSummaryDTO(u.getId(), u.getUsername(), community.getName()))
-                .toList();
+        // If user is a REPRESENTATIVE, add all other REPRESENTATIVEs
+        if (managedUser.getRoles().contains(UserRole.REPRESENTATIVE)) {
+            authService.getAllRepresentatives().stream()
+                    .filter(u -> !u.getId().equals(managedUser.getId()))
+                    .forEach(u -> userSummaries.add(new UserSummaryDTO(
+                            u.getId(), 
+                            u.getUsername(), 
+                            u.getCommunity().getName(),
+                            true
+                    )));
+        }
+
+        return userSummaries.stream().toList();
+    }
+
+    /**
+     * Broadcasts a message to all community members.
+     * Only available to REPRESENTATIVEs.
+     *
+     * @param userDetails The currently authenticated user
+     * @param content The message content
+     * @return HTTP 200 OK on success
+     */
+    @PostMapping("/broadcast")
+    @ResponseBody
+    public ResponseEntity<?> broadcastMessage(
+            @AuthenticationPrincipal LocalZeroUserDetails userDetails,
+            @RequestParam String content) {
+
+        User sender = getManagedUser(userDetails);
+
+        if (!sender.getRoles().contains(UserRole.REPRESENTATIVE)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Only representatives can broadcast messages"));
+        }
+
+        try {
+            messageService.broadcastMessage(sender, content);
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to send broadcast: " + e.getMessage()));
+        }
     }
 }

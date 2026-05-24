@@ -166,4 +166,16 @@ public class NotificationService {
         notificationRepository.deleteById(notificationId);
         logger.info("✓ Notification deleted: {}", notificationId);
     }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void markAllAsRead(User user) {
+        // Om din metod för att hämta olästa heter något annat, ändra den här!
+        List<Notification> unread = getUnreadNotifications(user);
+
+        for (Notification notification : unread) {
+            notification.markAsRead();
+        }
+
+        notificationRepository.saveAll(unread);
+    }
 }

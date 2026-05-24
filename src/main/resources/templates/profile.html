@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - LocalZero</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/navbar.css}">
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/messaging.css}">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+
+<body>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="homepage-container">
+    <div class="profile-container" style="padding-top: 20px;">
+
+        <div class="profile-header">
+            <div class="profile-user-info">
+                <h1 th:text="${profile.username}">Username</h1>
+                <p th:text="${profile.email}">email@example.com</p>
+
+                <div class="profile-stats">
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-value" th:text="${profile.postCount}">0</span>
+                        <span class="profile-stat-label">Posts</span>
+                    </div>
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-value" th:text="${profile.createdInitiativeCount}">0</span>
+                        <span class="profile-stat-label">Created</span>
+                    </div>
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-value" th:text="${profile.initiativeCount}">0</span>
+                        <span class="profile-stat-label">Joined</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-actions">
+                <a th:href="@{/initiatives/create}" class="btn-primary">New Initiative</a>
+                <button class="btn-secondary">Edit Profile</button>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h2>Initiatives I've Created</h2>
+            <div th:if="${not #lists.isEmpty(profile.createdInitiatives)}" class="profile-initiative-grid">
+                <a th:each="initiative : ${profile.createdInitiatives}"
+                   th:href="@{/initiatives/{id}(id=${initiative.id})}"
+                   class="profile-initiative-card">
+                    <h3 th:text="${initiative.title}">Initiative Title</h3>
+                    <p th:text="${initiative.description}">Short description of the initiative...</p>
+                    <div class="profile-initiative-meta">
+                        <span th:text="${initiative.category}">Category</span>
+                        <span th:text="${#temporals.format(initiative.startDate, 'MMM yyyy')}">Date</span>
+                    </div>
+                </a>
+            </div>
+            <div th:if="${#lists.isEmpty(profile.createdInitiatives)}" class="no-data-message">
+                You haven't created any initiatives yet.
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h2>Initiatives I've Joined</h2>
+            <div th:if="${not #lists.isEmpty(profile.joinedInitiatives)}" class="profile-initiative-grid">
+                <a th:each="initiative : ${profile.joinedInitiatives}"
+                   th:href="@{/initiatives/{id}(id=${initiative.id})}"
+                   class="profile-initiative-card">
+                    <h3 th:text="${initiative.title}">Initiative Title</h3>
+                    <p th:text="${initiative.description}">Short description of the initiative...</p>
+                    <div class="profile-initiative-meta">
+                        <span th:text="${initiative.category}">Category</span>
+                        <span th:text="${#temporals.format(initiative.startDate, 'MMM yyyy')}">Date</span>
+                    </div>
+                </a>
+            </div>
+            <div th:if="${#lists.isEmpty(profile.joinedInitiatives)}" class="no-data-message">
+                You haven't joined any initiatives yet.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/messaging.js}"></script>
+</body>
+</html>
